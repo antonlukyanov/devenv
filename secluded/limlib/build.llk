@@ -1,0 +1,7 @@
+use_rules('mingw.lru', { dll = true, libs = "tiff jpeg zlib" } )
+
+addpar{
+  use = {},
+  start = 'limlibdll.cc',
+  dest = 'limlib.dll',
+}

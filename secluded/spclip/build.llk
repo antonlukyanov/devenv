@@ -1,0 +1,7 @@
+use_rules('mingw.lru', { gui = true })
+
+addpar{
+  use = {},
+  start = 'spclip.cc',
+  dest = 'spclip.exe',
+}

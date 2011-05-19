@@ -1,0 +1,7 @@
+use_rules('mingw.lru', { dll = true, gui = true } )
+
+addpar{
+  use = { 'lwml' },
+  start = 'lswg.cc',
+  dest = 'lswg.dll',
+}

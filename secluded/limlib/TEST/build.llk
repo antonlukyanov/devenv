@@ -1,0 +1,7 @@
+use_rules('mingw.lru')
+
+addpar{
+  use = { 'secluded/limlib' },
+  start = 'test.cc',
+  dest = 'test.exe',
+}

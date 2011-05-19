@@ -1,0 +1,38 @@
+.Language=English,English
+.PluginContents=Editor Session Saver
+
+@Contents
+$ #Editor Session Saver#
+
+ #General Info#
+
+ Plugin eSession provides saving and restoring of editor session.
+
+ "Editor session" is a set of opened files and positions in these files.
+We plan to provide saving of bookmarks for every file,
+viewing of bookmark's list and setting of stack marks for current file.
+
+ Plugin works only in version 1.70 beta 5 of Far and uses shared library msvcrt.dll.
+
+ #Functions#
+
+    Save session      save session to file
+    Load session      load session from file
+
+ Session is keeped in file esession.far in current directory.
+Plugin does not notify about rewriting of existing file and
+silently exits if there is no session file at session loading.
+
+ #Version history#
+
+    1.01  2004.01.03  saving and restoring of list of opened files
+                      and positions in these files
+
+ #Author#
+
+    Michael Machin aka ltwood
+    Light Wood Design Group
+    Yaroslavl
+    mailto:ltwood@@mail.yar.ru
+
+

@@ -1,0 +1,7 @@
+use_rules('mingw.lru', { dll = true } )
+
+addpar{
+  use = { },
+  start = 'llogsrvdll.cc',
+  dest = 'llogsrv.dll',
+}

@@ -1,0 +1,7 @@
+use_rules('mingw.lru')
+
+addpar{
+  use = { 'lwml' },
+  start = 'dllver.cc',
+  dest = 'dllver.exe',
+}

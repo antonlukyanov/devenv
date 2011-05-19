@@ -1,0 +1,97 @@
+diff -u -b -B -r wxWidgets-2.6.4.orig/src/msw/window.cpp wxWidgets-2.6.4/src/msw/window.cpp
+--- wxWidgets-2.6.4.orig/src/msw/window.cpp	Fri Jan 12 05:47:28 2007
++++ wxWidgets-2.6.4/src/msw/window.cpp	Mon Jan 21 11:22:02 2008
+@@ -137,6 +137,57 @@
+ #define USE_DEFERRED_SIZING 1
+ #endif
+ 
++// In mingw/msw C++ exceptions must not be propogated over
++// winapi function because they corrupt SEH.
++// So we have to deal with them when we are inside hooks and wndproc.
++// result = 1 if it's Ok
++// result = 0 if the exception was caught and handled; if not - it will never return.
++#if wxUSE_EXCEPTIONS && defined(__MINGW32__)
++#define WX_MINGW_EXCEPTION_WRAP(statement, result) \
++  try\
++  {\
++      result = 1;\
++      statement;\
++  }\
++  catch ( ... )\
++  {\
++      try\
++      {\
++          if ( !wxTheApp || !wxTheApp->OnExceptionInMainLoop() )\
++          {\
++              /* OnException() tolds us to terminate program */\
++              ::MessageBox\
++                (\
++                  NULL,\
++                  _T("An unhandled exception occurred. Terminating."),\
++                  _T("Unhandled exception"),\
++                  MB_OK | MB_ICONERROR | MB_TASKMODAL\
++                );\
++              /* But what else can we do from here?*/\
++              ::wxExit();\
++          }\
++          /* else exception is supposed to be handled, continue*/\
++          result = 0;\
++      }\
++      catch ( ... )\
++      {\
++          /* OnException() throwed, possibly rethrowing the same*/\
++          /* exception again. Well, in mingw under msw we can't let it*/\
++          /* go, so we die.*/\
++          ::MessageBox\
++            (\
++              NULL,\
++              _T("An unhandled exception propogated. Terminating."),\
++              _T("Unhandled exception"),\
++              MB_OK | MB_ICONERROR | MB_TASKMODAL\
++            );\
++          ::wxExit();\
++      }\
++  }
++#else
++  #define WX_MINGW_EXCEPTION_WRAP(statement) statement;
++#endif // wxUSE_EXCEPTIONS && defined(__MINGW32__)
++
+ // ---------------------------------------------------------------------------
+ // global variables
+ // ---------------------------------------------------------------------------
+@@ -2352,7 +2403,12 @@
+     LRESULT rc;
+ 
+     if ( wnd && wxEventLoop::AllowProcessing(wnd) )
+-        rc = wnd->MSWWindowProc(message, wParam, lParam);
++    {
++        int res = 1;
++        WX_MINGW_EXCEPTION_WRAP(rc = wnd->MSWWindowProc(message, wParam, lParam), res);
++        if( res == 0 )
++          return 0;
++    }
+     else
+         rc = ::DefWindowProc(hWnd, message, wParam, lParam);
+ 
+@@ -5624,7 +5680,11 @@
+ 
+             if ( handler && handler->ProcessEvent(event) )
+             {
++                bool r = false;
++                int dumb;
++                WX_MINGW_EXCEPTION_WRAP(r = handler->ProcessEvent(event), dumb);
+                 // processed
++                if( r )
+                 return 1;
+             }
+         }
+@@ -6251,7 +6311,8 @@
+         // processed multiple times if now someone just called PeekMessage()
+         if ( msg->message == WM_NULL && wParam == PM_REMOVE )
+         {
+-            wxTheApp->ProcessPendingEvents();
++            int dumb;
++            WX_MINGW_EXCEPTION_WRAP(wxTheApp->ProcessPendingEvents(), dumb);
+         }
+ 
+         return CallNextHookEx(ms_hMsgHookProc, nCode, wParam, lParam);
