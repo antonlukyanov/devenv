@@ -639,5 +639,5 @@ else
 end
 
 if perror_count > 0 then
-  io.stderr:write(perror_count .. ' error(s), see file' .. perror_fn .. ' for details\n')
+  io.stderr:write(perror_count .. ' error(s), see file ' .. perror_fn .. ' for details\n')
 end
