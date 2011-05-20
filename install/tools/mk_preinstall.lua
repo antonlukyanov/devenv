@@ -6,10 +6,10 @@
   Во время инсталяцией следует использовать скрипт preinstall.sh, расположенный в репозитории.
 --]]
 
-tpu_path = '../lwutils/third-party'         -- from /lwboot
-lua_path = '$TPU/lua51/src'                 -- from /lwboot
+tpu_path = '../third-party'  -- from utils/install
+lua_path = '$TPU/lua51/src'
 
-lua_modules = dofile('../../lwutils/third-party/lua-addons/setup/lua_modules.lua') -- from here
+lua_modules = dofile('../../third-party/lua-addons/setup/lua_modules.lua') -- from here
 
 file = assert(io.open('../preinstall.sh', 'wt'))
 

@@ -155,7 +155,7 @@ reg_ext('.lua', 'luascript', home .. '/utils/lua.exe')
 msg "Building lua utilities..."
 
 -- копируем lua-утилиты
-lua_make('lwutils/lutils', 'setup.lua')
+lua_make('lutils', 'setup.lua')
 
 --
 -- Сборка внешних утилит
@@ -164,22 +164,22 @@ lua_make('lwutils/lutils', 'setup.lua')
 do
   -- собираем lua
   msg "Building lua interpreter..."
-  local lua_path = 'lwutils/third-party/lua-addons/setup'
+  local lua_path = 'third-party/lua-addons/setup'
   execf('cp temp/standalone-lua.exe ../%s', lua_path)
   lua_make(lua_path, 'build_lua.lua')
   os.remove('../' .. lua_path .. '/' .. 'standalone-lua.exe')
 
   -- собираем libjpeg
   msg "Building libjpeg..."
-  lua_make('lwutils/third-party/libjpeg')
+  lua_make('third-party/libjpeg')
 
   -- собираем libzlib
   msg "Building libzlib..."
-  lua_make('lwutils/third-party/zlib')
+  lua_make('third-party/zlib')
 
   -- собираем libtiff
   msg "Building libtiff..."
-  lua_make('lwutils/third-party/libtiff')
+  lua_make('third-party/libtiff')
 
   -- собираем сторонние lua-модули
   msg "Building lua modules..."
@@ -188,23 +188,23 @@ do
 
   -- компилируем специфичные lua-скрипты
   msg "Building lua scripts..."
-  local hlpath = '../lwutils/lutils' --!!
+  local hlpath = '../lutils' --!!
   execf('lua %s/lutils/luaccc.lua %s/utils/lred.lua >nul', home, hlpath)
   execf('lua %s/lutils/luaccc.lua %s/llake/llake.lua >nul', home, hlpath)
   execf('mv lred.exe llake.exe %s/utils', home)
 
   -- собираем сторонние утилиты
   msg "Building external utilities..."
-  lua_make('lwutils/third-party/ccalc')
-  lua_make('lwutils/third-party/dbmon')
-  lua_make('lwutils/third-party/winutl')
-  lua_make('lwutils/third-party/jpeg2ps')
-  lua_make('lwutils/third-party/mimetex')
+  lua_make('third-party/ccalc')
+  lua_make('third-party/dbmon')
+  lua_make('third-party/winutl')
+  lua_make('third-party/jpeg2ps')
+  lua_make('third-party/mimetex')
 
   if not is_file(home .. '/share/libiconv2.dll') then
     msg("** can't find <libiconv2.dll>, building luaiconv.dll skipped")
   else
-    lua_make('lwutils/third-party/luaiconv')
+    lua_make('third-party/luaiconv')
   end
 end
 
@@ -222,20 +222,20 @@ end
 
 -- независимые от lwml утилиты
 
-make('lwutils/secluded/ldatav', 'ldatav.exe', 'utils')
-make('lwutils/secluded/limlib', 'limlib.dll', 'share')
-make('lwutils/secluded/llogsrv', 'llogsrv.dll', 'share')
+make('secluded/ldatav', 'ldatav.exe', 'utils')
+make('secluded/limlib', 'limlib.dll', 'share')
+make('secluded/llogsrv', 'llogsrv.dll', 'share')
 
 -- зависимые от lwml утилиты
 
-make('lwutils/lwml-dep/dllver', 'dllver.exe', 'utils')
-make('lwutils/lwml-dep/limcov', 'limcov.dll', 'share')
-make('lwutils/lualib/lswg', 'lswg.dll', 'share')
-make('lwutils/lualib/lualwml', 'lualwml.dll', 'share')
-make('lwutils/lwml-dep/lwhich', 'lwhich.exe', 'utils')
+make('lwml-dep/dllver', 'dllver.exe', 'utils')
+make('lwml-dep/limcov', 'limcov.dll', 'share')
+make('lualib/lswg', 'lswg.dll', 'share')
+make('lualib/lualwml', 'lualwml.dll', 'share')
+make('lwml-dep/lwhich', 'lwhich.exe', 'utils')
 
 -- копирование
 
-local hlc_path = '../lwutils/lwml-dep/limcov'
+local hlc_path = '../lwml-dep/limcov'
 execf('cp %s/limcov_dll.h %s/include', hlc_path, home)
 execf('cp %s/limcov.a %s/lib/liblimcov.a', hlc_path, home)

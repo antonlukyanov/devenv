@@ -11,7 +11,7 @@ build_name = 'build-lwdg-' .. model
 wxsrc_msys_path = '/usr/local/src/wxWidgets-2.6.4'
 lwdg_msys_path = '/lwdg'
 wxdst_msys_path = lwdg_msys_path .. '/wx'
-patch_msys_path = lwdg_msys_path .. '/trunk/lwutils/third-party/wx/wxwidgets-2.6.4.diff'
+patch_msys_path = lwdg_msys_path .. '/utils/third-party/wx/wxwidgets-2.6.4.diff'
 
 options = '--enable-vendor=lwdg --with-msw --enable-gui --with-opengl --enable-exceptions --disable-precomp-headers'
 if model == 'static' then
