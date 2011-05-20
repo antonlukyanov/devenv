@@ -1,4 +1,4 @@
-use_rules('mingw.lru', { gui = true })
+use_rules('lwml/mingw.lru', { gui = true })
 
 addpar{
   use = {},
