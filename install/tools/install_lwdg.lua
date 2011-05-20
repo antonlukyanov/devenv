@@ -44,8 +44,6 @@ end
 
 test_path(get_cfg_path('mingw') .. '/bin')
 test_path(get_cfg_path('msys') .. '/bin')
-test_path(get_cfg_path('svn'))
-test_path(get_cfg_path('gnuplot') .. '/bin')
 
 test_path(home .. '/utils')
 test_path(home .. '/share')
@@ -83,12 +81,6 @@ test_exist('dos2unix.exe', 'please, install mingw (package mingw-utils-0.3)')
 test_exist('gcc.exe', 'please, install mingw (package gcc-core-3.4.5)')
 test_exist('g++.exe', 'please, install mingw (package gcc-g++-3.4.5)')
 
--- svn
-test_exist('svn.exe', 'please, install subversion (version 1.6.x)')
-
--- gnuplot
-test_exist('wgnuplot.exe', 'please, install gnuplot (version 4.2.2)')
-
 --
 -- провер€ем версии программ
 --
@@ -121,15 +113,6 @@ end
 
 test_ver('sh.exe', '2.04.0')
 test_ver('gcc.exe', '3.4.5')
-test_ver('svn.exe',
-  function( v1, v2, v3 )
-    if v1 ~= '1' or (v1 == '1' and tonumber(v2) < 6)  then
-      msg("** version of SVN is <" .. v1..'.'..v2..'.'..v3 .. ">")
-      msg("** there is no warranty about compatibility with 2x.ru")
-    end
-    return true
-  end
-)
 
 --
 -- создаем отсутствующие поддиректории домашнего каталога
