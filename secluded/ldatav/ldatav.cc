@@ -79,9 +79,9 @@ const double DIV = 0.70710678118654752;
 const double WIN_DEF_WIDTH = 0.75;
 const double WIN_DEF_HEIGHT = 0.75;
 
-#include "revision.svn"
+#include "revision.hg"
 
-const char LDATAV_VER[] = "2.63." SVN_VER;
+const char LDATAV_VER[] = "2.63." HG_VER;
 
 // common func
 

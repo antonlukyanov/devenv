@@ -15,9 +15,9 @@ LWML_EXPORT const char* zzz_ver();
 
 // version
 
-#include "revision.svn"
+#include "revision.hg"
 
-static const char ver[] = "1.03." SVN_VER;
+static const char ver[] = "1.03." HG_VER;
 
 const char* zzz_ver()
 {

@@ -7,9 +7,9 @@
 
 #define PATHSTRLEN   256
 
-#include "revision.svn"
+#include "revision.hg"
 
-const char VER[] = "1.00." SVN_VER;
+const char VER[] = "1.00." HG_VER;
 const char DELIM[] = "--------------------------------------------------------------";
 
 // common func

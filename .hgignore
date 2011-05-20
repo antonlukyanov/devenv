@@ -41,7 +41,6 @@ secluded/limlib/*.o
 secluded/limlib/TEST/test.exe
 secluded/llogsrv/llogsrv.a
 secluded/llogsrv/llogsrv.dll
-secluded/llogsrv/svn_ver
 secluded/spclip/spclip.exe
 third-party/anigif/unfreez.exe
 third-party/ccalc/*.exe
@@ -63,3 +62,4 @@ third-party/lua51/src/lua51.dll
 third-party/luaiconv/*.a
 third-party/luaiconv/*.def
 obj/*.o
+revision.hg

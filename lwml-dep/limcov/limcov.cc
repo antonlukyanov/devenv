@@ -60,10 +60,10 @@ CATCH
 
 // version
 
-#include "revision.svn"
+#include "revision.hg"
 
 namespace {
-  const char ver[] = "2.01." SVN_VER;
+  const char ver[] = "2.01." HG_VER;
   int ver_major = 2;
 };
 

@@ -6,9 +6,9 @@
 
 using namespace lwml;
 
-#include "revision.svn"
+#include "revision.hg"
 
-const char VER[] = "lwhich, ver. 1.2." SVN_VER ", (c) ltwood, 2004 Aug";
+const char VER[] = "lwhich, ver. 1.2." HG_VER ", (c) ltwood, 2004 Aug";
 
 const int BUF_LEN = 2048;
 

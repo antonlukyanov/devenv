@@ -5,7 +5,7 @@
 
 #include "lswg.eh"
 
-#include "revision.svn"
+#include "revision.hg"
 
 /*#lake:stop*/
 
@@ -346,7 +346,7 @@ const char* lswg_errmsg()
   CATCH_EX(ex_lswg, FAIL_LSWG)                    \
   CATCH_EX(ex_base, FAIL_INTERNAL)                //
 
-const char ver[] = "lswg, ver. 1.10, " SVN_VER;
+const char ver[] = "lswg, ver. 1.10, " HG_VER;
 
 const char* lswg_ver()
 {

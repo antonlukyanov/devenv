@@ -26,7 +26,7 @@ extern "C" {
 // ѕри этом провер€етс€ старша€ часть версии, возвращаема€ функцией llogsrv_ver().
 // Ёта часть версии должна мен€тьс€ только при изменении интерфейса библиотеки.
 
-#include "revision.svn"
+#include "revision.hg"
 
 #define VER_MAIN 3
 #define VER_SUBV 02
@@ -34,7 +34,7 @@ extern "C" {
 #define MK_STR_(arg) #arg
 #define MK_STR(arg) MK_STR_(arg)
 
-static const char ver[] = MK_STR(VER_MAIN) "." MK_STR(VER_SUBV) "." SVN_VER;
+static const char ver[] = MK_STR(VER_MAIN) "." MK_STR(VER_SUBV) "." HG_VER;
 static const int iver = VER_MAIN;
 
 const char* zzz_ver()

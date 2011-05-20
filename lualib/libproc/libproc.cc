@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-#include "revision.svn"
+#include "revision.hg"
 
 /*#lake:stop*/
 

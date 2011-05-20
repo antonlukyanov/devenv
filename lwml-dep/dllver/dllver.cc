@@ -4,9 +4,9 @@
 
 using namespace lwml;
 
-#include "revision.svn"
+#include "revision.hg"
 
-const char VER[] = "dllver, ver. 1.0." SVN_VER ", internal lwdg utility";
+const char VER[] = "dllver, ver. 1.0." HG_VER ", internal lwdg utility";
 
 typedef const char* (*ver_func)();
 

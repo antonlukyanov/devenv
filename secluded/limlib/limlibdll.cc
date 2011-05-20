@@ -51,10 +51,10 @@ int limlib_save( const char* fn, int lx, int ly, const uchar* data )
     return LIMLIB_OK;
 }
 
-#include "revision.svn"
+#include "revision.hg"
 
 namespace {
-  const char ver[] = "4.01." SVN_VER;
+  const char ver[] = "4.01." HG_VER;
   int ver_major = 4;
 };
 
