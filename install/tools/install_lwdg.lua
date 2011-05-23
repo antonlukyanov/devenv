@@ -8,13 +8,15 @@ dofile('tools/istools.lua')
 --
 -- Формируем список задач
 --
-tasks = {}
-tasks_str = ""
-for j =1, #arg do
-  tasks[arg[j]] = true
-  tasks_str = tasks_str .. arg[j] .. ' '
+do
+  tasks = {}
+  local tasks_str = ""
+  for j =1, #arg do
+    tasks[arg[j]] = true
+    tasks_str = tasks_str .. arg[j] .. ' '
+  end
+  msg("Tasks: " .. tasks_str)
 end
-msg("Tasks: " .. tasks_str)
 
 home = get_cfg_path('home')
 

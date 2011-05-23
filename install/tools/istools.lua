@@ -156,14 +156,17 @@ end
 
 -- файл локальной конфигурации пользователя
 
-local cfg_file = loadfile('user.cfg')
-if not cfg_file then
-  stop("can't obtain user configuration, please check file <user.cfg>")
-end
-
-local cfg = cfg_file()
+local cfg = nil
 
 function get_cfg( var )
+  if not cfg then
+    local cfg_file = loadfile('user.cfg')
+    if not cfg_file then
+      stop("can't obtain user configuration, please check file <user.cfg>")
+    end
+    cfg = cfg_file()
+  end
+
   if not cfg[var] then
     stop('cant find parameter <%s> in user configuration, please check file <user.cfg>', var)
   end
