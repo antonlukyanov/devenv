@@ -57,9 +57,6 @@ if tasks['setenv'] then
     end
   end
 
-  test_path(get_cfg_path('mingw') .. '/bin')
-  test_path(get_cfg_path('msys') .. '/bin')
-
   test_path(home .. '/utils')
   test_path(home .. '/share')
   test_path(home .. '/lutils')
