@@ -24,14 +24,13 @@ end
 
 msys = get_cfg_path('msys')
 mingw = get_cfg_path('mingw')
-home = get_cfg_path('home')
 wxsrc = get_cfg_path('wxsrc')
 
 execf('cp %s/etc/fstab temp', msys)
 
 file = assert(io.open(msys .. '/etc/fstab', 'wt'))
 file:write(mingw, ' /mingw\n')
-file:write(home, ' ', lwdg_msys_path, '\n')
+file:write(calc_home(), ' ', lwdg_msys_path, '\n')
 file:write(wxsrc, ' ', wxsrc_msys_path, '\n')
 file:close()
 
