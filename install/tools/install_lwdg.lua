@@ -21,6 +21,53 @@ end
 home = calc_home()
 
 --
+-- Сбрасываем переменные среды
+--
+if tasks['cleanenv'] then
+  msg "Cleaning environment variables..."
+
+  del_env("lwml_zzz", "")
+  del_env("lua_path", "")
+  del_env("lua_cpath", "")
+  del_env("lwdg_home", "")
+  del_env("wxwin", "")
+
+  path_tbl = split(get_env('path'))
+  upath_tbl = split(get_user_path() or '')
+
+  local path_changed = false
+
+  function del_path( path )
+    path = norm_path(path)
+    if upath_tbl[path] then
+      path_tbl[path] = nil
+      upath_tbl[path] = nil
+      path_changed = true
+      log('PATH-=' .. path)
+    end
+  end
+
+  del_path(home .. '/utils')
+  del_path(home .. '/share')
+  del_path(home .. '/lutils')
+
+  del_path(home .. "/wx/build-lwdg-dll/lib")
+
+  if path_changed then
+    msg "  Setting PATH..."
+    local new_user_path = join(upath_tbl)
+    if new_user_path == "" then
+      del_user_env('path')
+    else
+      set_user_env('path', new_user_path)
+    end
+    set_proc_env('path', join(path_tbl))
+  else
+    msg "  PATH is ok."
+  end
+end
+
+--
 -- Устанавливаем переменные среды
 --
 if tasks['setenv'] then
@@ -55,7 +102,7 @@ if tasks['setenv'] then
       path_tbl[path] = path
       upath_tbl[path] = path
       path_changed = true
-      log('PATH=$PATH:' .. path)
+      log('PATH+=' .. path)
     end
   end
 

@@ -154,6 +154,12 @@ function set_user_env( var, val )
   istools.win32_update_config()
 end
 
+function del_user_env( var )
+  -- delete /f = force delete, /v = parameter
+  execf_unp('REG DELETE HKCU\\Environment /v %s /f 2>nul 1>nul', var)
+  istools.win32_update_config()
+end
+
 function set_proc_env( var, val )
   istools.win32_set_process_env(var, val)
 end
@@ -161,6 +167,11 @@ end
 function set_env( var, val )
   set_user_env(var, val)
   set_proc_env(var, val)
+end
+
+function del_env( var )
+  del_user_env(var)
+  set_proc_env(var, "")
 end
 
 -- файл локальной конфигурации пользователя
