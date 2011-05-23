@@ -43,6 +43,15 @@ function join( tbl )
   return res
 end
 
+function calc_home()
+  local cwd = norm_path(istools.cwd())
+  local cwd_tbl = {}
+  for s in cwd:gmatch('[^%/]+') do
+    table.insert(cwd_tbl, s)
+  end
+  return table.concat(cwd_tbl, '/', 1, #cwd_tbl - 2)
+end
+
 -- поддержка лога операций
 
 local log_fnm = istools.cwd() .. '/temp/install_lwdg.log'

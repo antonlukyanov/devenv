@@ -18,7 +18,7 @@ do
   msg("Tasks: " .. tasks_str)
 end
 
-home = get_cfg_path('home')
+home = calc_home()
 
 --
 -- Устанавливаем переменные среды
