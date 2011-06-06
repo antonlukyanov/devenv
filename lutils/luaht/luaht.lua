@@ -311,14 +311,18 @@ function cmd_def( term )
   clear_par()
 end
 
+local function out_styled_tag( tag, class )
+  printf('<%s class="%s">', tag, class)
+end
+
 function cmd_note()
-  printf'<blockquote class="note">'
+  out_styled_tag('blockquote', 'note')
   clear_par()
   stack:push('note', '</blockquote>')
 end
 
 function cmd_cite( author )
-  printf'<blockquote class="cite">'
+  out_styled_tag('blockquote', 'cite')
   clear_par()
   if author then
     stack:push('cite', '<br>//&nbsp;' .. author .. '</blockquote>')
@@ -328,13 +332,13 @@ function cmd_cite( author )
 end
 
 function cmd_sic()
-  printf'<blockquote class="sic">'
+  out_styled_tag('blockquote', 'sic')
   clear_par()
   stack:push('sic', '</blockquote>')
 end
 
 function cmd_epi( author )
-  printf'<blockquote class="epi">'
+  out_styled_tag('blockquote', 'epi')
   clear_par()
   if author then
     stack:push('epi', '<br>//&nbsp;' .. author .. '</blockquote>')
@@ -344,7 +348,7 @@ function cmd_epi( author )
 end
 
 function cmd_code()
-  printf'<pre class="code">'
+  out_styled_tag('pre', 'code')
   clear_par()
   is_code = true;
   stack:push('code', '</pre>', function() is_code = false end)
