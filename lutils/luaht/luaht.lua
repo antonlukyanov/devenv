@@ -62,6 +62,11 @@
   -- в специальных абзацах добавлены отступы от границы и рамки
   -- изменены цвета фона и заголовков
 
+  ver. 1.13, 2011.06.07
+
+  -- реализована поддржка опции '-g', генерирующей документы, предназначенные
+     для публикации на google-sites.
+
 --]=]
 
 require "libwaki"
@@ -613,7 +618,7 @@ if not package.loaded['luaht'] then
 
   -- должен быть один аргумент - имя файла
   if #arg ~= 1 then
-    io.stderr:write("html generator, ver 1.12, (c) ltwood\n")
+    io.stderr:write("html generator, ver 1.13, (c) ltwood\n")
     io.stderr:write("usage: luaht [-i] [-g] lht-file-name\n")
     os.exit(1)
   end
