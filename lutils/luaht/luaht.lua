@@ -464,6 +464,54 @@ end
 
 -- заголовки и трэйлеры
 
+local style_tbl = {
+  ['blockquote'] = {
+    ['sic'] = [[
+      background-color: #dddddd;
+      border: 1px dashed #aaaaaa;
+      padding: 3px;
+      font-weight: bold;
+      font-size: 90%;
+      line-height: 120%;
+    ]],
+    ['note'] = [[
+      background-color: #dddddd;
+      border: 1px dashed #aaaaaa;
+      padding: 3px;
+      font-size: 90%;
+      line-height: 120%;
+    ]],
+    ['cite'] = [[
+      background-color: #dddddd;
+      border: 1px dashed #aaaaaa;
+      padding: 3px;
+      font-style: italic;
+      font-size: 90%;
+      line-height: 120%;
+    ]],
+    ['epi'] = [[
+      margin-left: 50%;
+      margin-right: 0%;
+      border: 1px dashed #aaaaaa;
+      padding: 3px;
+      background-color: #dddddd;
+      font-style: italic;
+      font-weight: bold;
+      font-size: 90%;
+      line-height: 120%;
+    ]],
+  },
+  ['pre'] = {
+    ['code'] = [[
+      background-color: #dddddd;
+      border: 1px dashed #aaaaaa;
+      padding: 3px;
+      font-size: 90%;
+      line-height: 120%;
+    ]]
+  },
+}
+
 local style = [[
   body {
     background-color: #e7e9dc;
@@ -477,48 +525,7 @@ local style = [[
   h3 { color: #4e4f43; }
   h4 { color: #4e4f43; }
   code {
-    font-size: 125%;
-  }
-  blockquote.sic {
-    background-color: #dddddd;
-    border: 1px dashed #aaaaaa;
-    padding: 3px;
-    font-weight: bold;
-    font-size: 90%;
-    line-height: 120%;
-  }
-  blockquote.note {
-    background-color: #dddddd;
-    border: 1px dashed #aaaaaa;
-    padding: 3px;
-    font-size: 90%;
-    line-height: 120%;
-  }
-  blockquote.cite {
-    background-color: #dddddd;
-    border: 1px dashed #aaaaaa;
-    padding: 3px;
-    font-style: italic;
-    font-size: 90%;
-    line-height: 120%;
-  }
-  blockquote.epi {
-    margin-left: 50%;
-    margin-right: 0%;
-    border: 1px dashed #aaaaaa;
-    padding: 3px;
-    background-color: #dddddd;
-    font-style: italic;
-    font-weight: bold;
-    font-size: 90%;
-    line-height: 120%;
-  }
-  pre.code {
-    background-color: #dddddd;
-    border: 1px dashed #aaaaaa;
-    padding: 3px;
-    font-size: 90%;
-    line-height: 120%;
+    font-size: 100%;
   }
 ]]
 
@@ -532,7 +539,13 @@ local function print_header( fn )
   printf'</head>'
 
   printf('<style type="text/css">')
-  printf('%s</style>', style)
+  printf('%s', style)
+  for tnm, tst in pairs(style_tbl) do
+    for snm, sval in pairs(tst) do
+      printf('  %s.%s {\n%s}\n', tnm, snm, sval)
+    end
+  end
+  printf('</style>', style)
 
   printf('<body>')
 end
