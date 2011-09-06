@@ -19,10 +19,10 @@ list = {
  { 'lutils/lib', 'lib/libmacro.lua' },
  { 'lutils/lib', 'lib/libmd5.lua' },
  { 'lutils/lib', 'lib/libprot.lua' },
+ { 'lutils/lib', 'lib/librepo.lua' },
  { 'lutils/lib', 'lib/librexp.lua' },
  { 'lutils/lib', 'lib/libsys.lua' },
  { 'lutils/lib', 'lib/libwaki.lua' },
- { 'lutils/lib', 'lib/librepo.lua' },
 
  { 'lutils', 'luaht/luaht.lua' },
  { 'lutils', 'luaht/mkdoc.lua' },
@@ -39,9 +39,6 @@ list = {
  { 'lutils', 'meta/luacc.lua' },
  { 'lutils', 'meta/luaccc.lua' },
  { 'lutils/lib', 'meta/luacc_driver.lua' },
-
- { 'lutils', 'rcs/mkrcs.lua' },
- { 'lutils/lib', 'rcs/librcs.lua' },
 
  { 'lutils', 'utils/bin2hex.lua' },
  { 'lutils', 'utils/cplist.lua' },
