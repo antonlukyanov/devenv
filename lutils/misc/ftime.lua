@@ -4,7 +4,6 @@
 --]]
 
 require "libdir"
-require "librexp"
 
 if #arg < 2 then
   io.write('Usage: lua ftime.lua num path [exclude...]\n')
@@ -13,7 +12,7 @@ end
 
 excl = {}
 for j = 3, #arg do
-  table.insert(excl, rexp.qsearch(arg[j]))
+  table.insert(excl, lang.quot_search(arg[j]))
 end
 
 function is_good( fn )

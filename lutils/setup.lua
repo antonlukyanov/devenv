@@ -18,9 +18,7 @@ list = {
  { 'lutils/lib', 'lib/libluaps.lua' },
  { 'lutils/lib', 'lib/libmacro.lua' },
  { 'lutils/lib', 'lib/libmd5.lua' },
- { 'lutils/lib', 'lib/libprot.lua' },
  { 'lutils/lib', 'lib/librepo.lua' },
- { 'lutils/lib', 'lib/librexp.lua' },
  { 'lutils/lib', 'lib/libsys.lua' },
  { 'lutils/lib', 'lib/libwaki.lua' },
 
