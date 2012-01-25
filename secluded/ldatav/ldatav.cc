@@ -997,9 +997,20 @@ void data_renderer::show_data(){
   }
 
   char buf[CAPTION_LEN];
-  sprintf(buf, "Y: [%lg, %lg]  scale=%.3lf", data.min(), data.max(), _yscale);
+
+  // Верхняя строка информации.
+
+  // Видимый в окне диапазон значений.
+  double y_min = y2value(0);
+  double y_max = y2value(1);
+  sprintf(buf, "Y: [%lg, %lg]  win=[%lg, %lg]  scale=%.3lf",
+    data.min(), data.max(), y_min, y_max, _yscale);
   window.put_header_text(buf);
-  sprintf(buf, "X: [%d, %d]  win=%d  grid=%.2lf", start, start+scrsize-1, scrsize, scrsize/10.0);
+
+  // Нижняя строка информации.
+
+  int len = data.num() > 0 ? data.len(0) : 0; // Длина первого набора данных.
+  sprintf(buf, "X: len=%d [%d, %d]  win=%d  grid=%.2lf", len, start, start+scrsize-1, scrsize, scrsize/10.0);
   window.put_footer_text(buf);
 }
 
