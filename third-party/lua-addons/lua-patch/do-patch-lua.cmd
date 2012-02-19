@@ -1,0 +1,1 @@
+patch ../../lua51/src/luaconf.h lua-5_1.diff

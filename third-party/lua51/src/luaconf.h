@@ -154,9 +154,9 @@
 #if defined(LUA_BUILD_AS_DLL)
 
 #if defined(LUA_CORE) || defined(LUA_LIB)
-#define LUA_API __declspec(dllexport)
+#define LUA_API extern "C" __declspec(dllexport)
 #else
-#define LUA_API __declspec(dllimport)
+#define LUA_API extern "C" __declspec(dllimport)
 #endif
 
 #else
