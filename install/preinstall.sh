@@ -2,8 +2,9 @@
 
 echo Building installation environment...
 TPU=../third-party
-patch --output=$TPU/lua51/src/linit_istools.c $TPU/lua51/src/linit.c $TPU/lua-addons/misc/lua-istools.diff
-cp $TPU/lua-addons/misc/istools.c $TPU/lua51/src
+patch --output=$TPU/lua51/src/linit_istools.c $TPU/lua51/src/linit.c $TPU/lua-addons/istools/lua-istools.diff
+cp $TPU/lua-addons/istools/istools.c $TPU/lua51/src
+echo Building temp/standalone-lua.exe...
 /mingw/bin/g++ -O2 -Wall -otemp/standalone-lua.exe \
   $TPU/lua51/src/istools.c \
   $TPU/lua51/src/lapi.c \
