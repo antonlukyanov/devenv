@@ -1,0 +1,13 @@
+--- float.h.ola	2011-12-02 00:36:05 +0000
++++ float.h	2012-02-20 13:19:41 +0000
+@@ -28,6 +28,10 @@
+ #ifndef _FLOAT_H___
+ #define _FLOAT_H___
+ 
++#ifndef _MINGW_FLOAT_H_
++#include_next <float.h>
++#endif
++
+ /* Radix of exponent representation, b. */
+ #undef FLT_RADIX
+ #define FLT_RADIX	__FLT_RADIX__
