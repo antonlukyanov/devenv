@@ -813,12 +813,12 @@ void eps_file::header( double width, double height ){
   _h = height;
   fprintf(file, "%%!PS-Adobe-2.0 EPSF-2.0\n");
   fprintf(file, "%%%%Pages: 0 0\n");
-  fprintf(file, "%%%%BoundingBox: 0.0 0.0 %lf %lf\n", mm2pspt(width), mm2pspt(height));
+  fprintf(file, "%%%%BoundingBox: 0.0 0.0 %f %f\n", mm2pspt(width), mm2pspt(height));
   fprintf(file, "%%%%EndComments\n");
   fprintf(file, "0 0 translate\n");
   fprintf(file, "/Courier findfont\n");
-  fprintf(file, "%lf scalefont setfont\n", mm2pspt(EPS_FONT_HEIGHT));
-  fprintf(file, "/pixel {%lf 0 360 arc fill} def\n", mm2pspt(EPS_PIXEL_SIZE));
+  fprintf(file, "%f scalefont setfont\n", mm2pspt(EPS_FONT_HEIGHT));
+  fprintf(file, "/pixel {%f 0 360 arc fill} def\n", mm2pspt(EPS_PIXEL_SIZE));
 }
 
 void eps_file::trailer(){
@@ -827,7 +827,7 @@ void eps_file::trailer(){
 }
 
 void eps_file::setwidth( double w ){
-  fprintf(file, "%lf setlinewidth\n", mm2pspt(w));
+  fprintf(file, "%f setlinewidth\n", mm2pspt(w));
 }
 
 void eps_file::clip( double x1, double y1, double x2, double y2 ){
@@ -835,7 +835,7 @@ void eps_file::clip( double x1, double y1, double x2, double y2 ){
   x1 = X(x1); x2 = X(x2);
   y1 = Y(y1); y2 = Y(y2);
   fprintf(file,
-    "newpath %lf %lf moveto %lf %lf lineto %lf %lf lineto %lf %lf lineto closepath clip\n",
+    "newpath %f %f moveto %f %f lineto %f %f lineto %f %f lineto closepath clip\n",
     mm2pspt(x1), mm2pspt(y1), mm2pspt(x2), mm2pspt(y1),
     mm2pspt(x2), mm2pspt(y2), mm2pspt(x1), mm2pspt(y2)
   );
@@ -854,7 +854,7 @@ void eps_file::line( double x1, double y1, double x2, double y2 ){
   x1 = X(x1); x2 = X(x2);
   y1 = Y(y1); y2 = Y(y2);
   fprintf(file,
-    "newpath %lf %lf moveto %lf %lf lineto stroke\n",
+    "newpath %f %f moveto %f %f lineto stroke\n",
     mm2pspt(x1), mm2pspt(y1), mm2pspt(x2), mm2pspt(y2)
   );
 }
@@ -862,13 +862,13 @@ void eps_file::line( double x1, double y1, double x2, double y2 ){
 void eps_file::pixel( double x, double y ){
   x = X(x); y = Y(y);
   fprintf(file,
-    "newpath %lf %lf pixel\n",
+    "newpath %f %f pixel\n",
     mm2pspt(x), mm2pspt(y)
   );
 }
 
 void eps_file::puts( double x, double y, const char* str ){
-  fprintf(file, "%lf %lf moveto (%s) show stroke\n", mm2pspt(x), mm2pspt(y), str);
+  fprintf(file, "%f %f moveto (%s) show stroke\n", mm2pspt(x), mm2pspt(y), str);
 }
 
 void eps_file::point( double x, double y, bool is_line ){
