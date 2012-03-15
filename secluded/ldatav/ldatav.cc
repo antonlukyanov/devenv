@@ -1003,14 +1003,14 @@ void data_renderer::show_data(){
   // Видимый в окне диапазон значений.
   double y_min = y2value(0);
   double y_max = y2value(1);
-  sprintf(buf, "Y: [%lg, %lg]  win=[%lg, %lg]  scale=%.3lf",
+  sprintf(buf, "Y: [%g, %g]  win=[%g, %g]  scale=%.3f",
     data.min(), data.max(), y_min, y_max, _yscale);
   window.put_header_text(buf);
 
   // Нижняя строка информации.
 
   int len = data.num() > 0 ? data.len(0) : 0; // Длина первого набора данных.
-  sprintf(buf, "X: len=%d [%d, %d]  win=%d  grid=%.2lf", len, start, start+scrsize-1, scrsize, scrsize/10.0);
+  sprintf(buf, "X: len=%d [%d, %d]  win=%d  grid=%.2f", len, start, start+scrsize-1, scrsize, scrsize/10.0);
   window.put_footer_text(buf);
 }
 
@@ -1086,9 +1086,9 @@ void data_renderer::export_to_eps( const char* fn ){
   eps.set_color(0, 0, 0);
 
   char buf[CAPTION_LEN];
-  sprintf(buf, "Y: [%lg, %lg]", data.min(), data.max());
+  sprintf(buf, "Y: [%g, %g]", data.min(), data.max());
   eps.puttext(buf, true);
-  sprintf(buf, "X: [%d, %d]  win=%d  grid=%.2lf", start, start+scrsize-1, scrsize, scrsize/10.0);
+  sprintf(buf, "X: [%d, %d]  win=%d  grid=%.2f", start, start+scrsize-1, scrsize, scrsize/10.0);
   eps.puttext(buf);
 }
 
