@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 #ifdef DOS
 #include <io.h>
