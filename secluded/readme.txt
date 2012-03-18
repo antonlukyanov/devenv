@@ -1,3 +1,0 @@
-Unused utils:
-  farsess
-  spclip
