@@ -27,7 +27,7 @@
 function cc( dst, src )
   home = os.getenv('LWDG_HOME')
   local compiler = string.format(
-    "g++ -DLUA_BUILD_AS_DLL -L%s -I%s -o %s %s -llua51", 
+    "g++ -static -DLUA_BUILD_AS_DLL -L%s -I%s -o %s %s -llua51", 
     home..'/lib', home..'/include', dst, src
   )
   os.execute(compiler)

@@ -1,4 +1,4 @@
-use_rules('lwml/mingw.lru', { dll = true, libs = "tiff jpeg zlib" } )
+use_rules('lwml/mingw.lru', { dll = true, static = true, libs = "tiff jpeg zlib" } )
 
 addpar{
   use = {},

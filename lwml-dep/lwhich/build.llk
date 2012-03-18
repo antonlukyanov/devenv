@@ -1,4 +1,4 @@
-use_rules('lwml/mingw.lru')
+use_rules('lwml/mingw.lru', { static = true })
 
 addpar{
   use = { 'lwml' },

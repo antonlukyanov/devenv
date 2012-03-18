@@ -14,9 +14,9 @@ for _, fn in ipairs(lua_modules) do
   mlist = mlist .. src_path .. fn .. '.c '
 end
 
-__("g++ -shared -Wl,--out-implib,liblua51.a -o lua51.dll -O2 -Wall -DLUA_BUILD_AS_DLL " .. mlist .. " 2>nul")
-__("g++ -o lua.exe -DLUA_BUILD_AS_DLL " .. src_path.."lua.c liblua51.a")
-__("g++ -o luac.exe -O2 -Wall " .. src_path.."luac.c " .. src_path.."print.c " .. mlist)
+__("g++ -static -shared -Wl,--out-implib,liblua51.a -o lua51.dll -O2 -Wall -DLUA_BUILD_AS_DLL " .. mlist .. " 2>nul")
+__("g++ -static -o lua.exe -DLUA_BUILD_AS_DLL " .. src_path.."lua.c liblua51.a")
+__("g++ -static -o luac.exe -O2 -Wall " .. src_path.."luac.c " .. src_path.."print.c " .. mlist)
 __("strip --strip-unneeded lua51.dll lua.exe luac.exe")
 
 -- setup
