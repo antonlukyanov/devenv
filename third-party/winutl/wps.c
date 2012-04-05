@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 int   main(int argc,char **argv) {
-  HANDLE	  hSnap;
+  HANDLE          hSnap;
   PROCESSENTRY32  pe;
 
   hSnap=CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0);
@@ -13,15 +13,15 @@ int   main(int argc,char **argv) {
   if (Process32First(hSnap,&pe))
     do {
       MODULEENTRY32   me;
-      HANDLE	      hMod;
+      HANDLE          hMod;
       if (pe.th32ProcessID==0)
-	continue;
+        continue;
       hMod=CreateToolhelp32Snapshot(TH32CS_SNAPMODULE,pe.th32ProcessID); 
       if (hMod==INVALID_HANDLE_VALUE) 
         continue;
       me.dwSize = sizeof(me); 
       if (Module32First(hMod,&me))
-	printf("%6d %-15s %s\n",pe.th32ProcessID,me.szModule,me.szExePath);
+        printf("%6d %-15s %s\n",pe.th32ProcessID,me.szModule,me.szExePath);
       CloseHandle(hMod); 
     } while (Process32Next(hSnap,&pe));
   CloseHandle(hSnap);

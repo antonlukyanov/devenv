@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main(int argc,char **argv) {
-  int	  pid;
+  int     pid;
   HANDLE  hProc;
 
   if (argc<2 || (pid=atoi(argv[1]))==0) {
