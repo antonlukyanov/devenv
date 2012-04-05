@@ -21,7 +21,7 @@ int   main(int argc,char **argv) {
         continue;
       me.dwSize = sizeof(me); 
       if (Module32First(hMod,&me))
-        printf("%6d %-15s %s\n",pe.th32ProcessID,me.szModule,me.szExePath);
+        printf("%d\t%s\t%s\n",pe.th32ProcessID,me.szModule,me.szExePath);
       CloseHandle(hMod); 
     } while (Process32Next(hSnap,&pe));
   CloseHandle(hSnap);
