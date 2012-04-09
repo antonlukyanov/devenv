@@ -1,4 +1,4 @@
 require "lswp"
 
-proc.set_background()
-proc.gpf_off()
+lswp.set_background()
+lswp.gpf_off()
