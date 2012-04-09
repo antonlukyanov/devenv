@@ -2,6 +2,6 @@ use_rules('lwml/mingw.lru', { dll = true, static = true } )
 
 addpar{
   use = { 'lwml' },
-  start = 'libproc.cc',
-  dest = 'libproc.dll',
+  start = 'lswp.cc',
+  dest = 'lswp.dll',
 }
