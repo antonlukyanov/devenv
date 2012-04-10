@@ -19,11 +19,39 @@ LUA_TRY
 LUA_CATCH(ex)
 }
 
-LUA_DEF_FUNCTION( set_background, L )
+LUA_DEF_FUNCTION( set_priority, L )
 {
   luaextn ex(L);
 LUA_TRY
-  SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+
+  int p = ex.get_int(1);
+
+  DWORD prior;
+  switch( p ){
+    case -2:
+      prior = IDLE_PRIORITY_CLASS;
+      break;
+    case -1:
+      prior = BELOW_NORMAL_PRIORITY_CLASS;
+      break;
+    case 0:
+      prior = NORMAL_PRIORITY_CLASS;
+      break;
+    case 1:
+      prior = ABOVE_NORMAL_PRIORITY_CLASS;
+      break;
+    case 2:
+      prior = HIGH_PRIORITY_CLASS;
+      break;
+    default:
+      put_error("lswp.set_priority: incorrect priority");
+      return ex.ret_num();
+  }
+
+  if( SetPriorityClass(GetCurrentProcess(), prior) == 0 )
+    put_error("lswp.set_priority: can't set priority");
+  else
+    put_bool(true);
 
   return ex.ret_num();
 LUA_CATCH(ex)
@@ -78,6 +106,18 @@ namespace {
   }
 };
 
+LUA_DEF_FUNCTION( run, L )
+{
+  luaextn ex(L);
+LUA_TRY
+  const char* cmdl = ex.get_str(1);
+
+  ex.put_int(run(cmdl, SW_SHOWMINNOACTIVE));
+
+  return ex.ret_num();
+LUA_CATCH(ex)
+}
+
 LUA_DEF_FUNCTION( run_min, L )
 {
   luaextn ex(L);
@@ -101,8 +141,6 @@ LUA_TRY
   return ex.ret_num();
 LUA_CATCH(ex)
 }
-
-//
 
 LUA_DEF_FUNCTION( sleep, L )
 {
@@ -209,7 +247,7 @@ LUA_CATCH(ex)
 
 LUA_BEGIN_LIBRARY(lswp)
   LUA_FUNCTION(gpf_off)
-  LUA_FUNCTION(set_background)
+  LUA_FUNCTION(set_priority)
   LUA_FUNCTION(run_min)
   LUA_FUNCTION(run_hide)
 
