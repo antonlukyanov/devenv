@@ -281,6 +281,7 @@ if tasks['localutl'] then
   make('lwml-dep/dllver', 'dllver.exe', 'utils')
   make('lwml-dep/limcov', 'limcov.dll', 'share')
   make('lualib/lswg', 'lswg.dll', 'share')
+  make('lualib/lswp', 'lswp.dll', 'share')
   make('lualib/lualwml', 'lualwml.dll', 'share')
   make('lwml-dep/lwhich', 'lwhich.exe', 'utils')
 
