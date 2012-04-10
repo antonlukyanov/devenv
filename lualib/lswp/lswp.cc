@@ -19,6 +19,36 @@ LUA_TRY
 LUA_CATCH(ex)
 }
 
+namespace {
+  bool set_proc_prior( HANDLE hProc, int prior )
+  {
+    DWORD prior_code;
+    switch( prior ){
+      case -2:
+        prior_code = IDLE_PRIORITY_CLASS;
+        break;
+      case -1:
+        prior_code = BELOW_NORMAL_PRIORITY_CLASS;
+        break;
+      case 0:
+        prior_code = NORMAL_PRIORITY_CLASS;
+        break;
+      case 1:
+        prior_code = ABOVE_NORMAL_PRIORITY_CLASS;
+        break;
+      case 2:
+        prior_code = HIGH_PRIORITY_CLASS;
+        break;
+      default:
+        return false;
+    }
+
+    if( SetPriorityClass(hProc, prior_code) == 0 )
+      return false;
+    return true;
+  }
+};
+
 LUA_DEF_FUNCTION( set_priority, L )
 {
   luaextn ex(L);
@@ -26,39 +56,18 @@ LUA_TRY
 
   int p = ex.get_int(1);
 
-  DWORD prior;
-  switch( p ){
-    case -2:
-      prior = IDLE_PRIORITY_CLASS;
-      break;
-    case -1:
-      prior = BELOW_NORMAL_PRIORITY_CLASS;
-      break;
-    case 0:
-      prior = NORMAL_PRIORITY_CLASS;
-      break;
-    case 1:
-      prior = ABOVE_NORMAL_PRIORITY_CLASS;
-      break;
-    case 2:
-      prior = HIGH_PRIORITY_CLASS;
-      break;
-    default:
-      put_error("lswp.set_priority: incorrect priority");
-      return ex.ret_num();
-  }
-
-  if( SetPriorityClass(GetCurrentProcess(), prior) == 0 )
-    put_error("lswp.set_priority: can't set priority");
+  if( set_proc_prior(GetCurrentProcess(), p) )
+    ex.put_bool(true);
   else
-    put_bool(true);
+    ex.put_error("lswp.set_priority: can't set priority");
 
   return ex.ret_num();
 LUA_CATCH(ex)
 }
 
 namespace {
-  int run( const char* cmdl, WORD show_window )
+  // show_window = { SW_HIDE, SW_SHOWMINNOACTIVE, SW_SHOWNORMAL }
+  bool run( uint* pid, const char* cmdl, const char* pwd, int prior, bool do_wait, WORD win )
   {
     STARTUPINFO si;
     si.cb = sizeof(si);
@@ -73,7 +82,7 @@ namespace {
     si.dwYCountChars = 0;
     si.dwFillAttribute = 0;
     si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = show_window;
+    si.wShowWindow = win;
     si.cbReserved2 = 0;
     si.lpReserved2 = NULL;
     si.hStdInput = NULL;
@@ -89,20 +98,26 @@ namespace {
       TRUE, // bInheritHandles
       0,    // dwCreationFlags
       NULL, // LPVOID lpEnvironment -- use inherited environment
-      NULL, // LPCTSTR lpCurrentDirectory -- use inherited cwd
+      pwd , // LPCTSTR lpCurrentDirectory -- use inherited cwd for NULL
       &si,  // lpStartupInfo
       &pi   // lpProcessInformation
     );
 
-    if( res ){
-      DWORD exit_code;
+    if( !res )
+      return false;
+
+    if( !set_proc_prior(pi.hProcess, prior) )
+      return false;
+
+    if( do_wait )
       WaitForSingleObject(pi.hProcess, INFINITE);
-      GetExitCodeProcess(pi.hProcess, &exit_code);
-      CloseHandle(pi.hProcess);
-      CloseHandle(pi.hThread);
-      return exit_code;
-    } else
-      return -1;
+
+    DWORD exit_code;
+    GetExitCodeProcess(pi.hProcess, &exit_code);
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    *pid = exit_code;
+    return true;
   }
 };
 
@@ -112,31 +127,53 @@ LUA_DEF_FUNCTION( run, L )
 LUA_TRY
   const char* cmdl = ex.get_str(1);
 
-  ex.put_int(run(cmdl, SW_SHOWMINNOACTIVE));
+  // default params
+  const char* pwd = 0;
+  int prior = 0;
+  bool do_wait = true;
+  const char* window = "normal";
 
-  return ex.ret_num();
-LUA_CATCH(ex)
-}
+  if( ex.arg_num() > 1 ){
+    luaL_checktype(L, 2, LUA_TTABLE);
 
-LUA_DEF_FUNCTION( run_min, L )
-{
-  luaextn ex(L);
-LUA_TRY
-  const char* cmdl = ex.get_str(1);
+    lua_pushstring(L, "pwd");
+    lua_gettable(L, 2);
+    if( !lua_isnil(L, -1) )
+      pwd = luaL_checkstring(L, -1);
 
-  ex.put_int(run(cmdl, SW_SHOWMINNOACTIVE));
+    lua_pushstring(L, "priority");
+    lua_gettable(L, 2);
+    if( !lua_isnil(L, -1) )
+      prior = static_cast<int>(luaL_checknumber(L, -1));
 
-  return ex.ret_num();
-LUA_CATCH(ex)
-}
+    lua_pushstring(L, "wait");
+    lua_gettable(L, 2);
+    if( !lua_isnil(L, -1) )
+      do_wait = lua_toboolean(L, -1);
 
-LUA_DEF_FUNCTION( run_hide, L )
-{
-  luaextn ex(L);
-LUA_TRY
-  const char* cmdl = ex.get_str(1);
+    lua_pushstring(L, "window");
+    lua_gettable(L, 2);
+    if( !lua_isnil(L, -1) )
+      window = luaL_checkstring(L, -1);
+  }
 
-  ex.put_int(run(cmdl, SW_HIDE));
+  WORD win;
+  if( strcmp(window, "normal") == 0 )
+    win = SW_SHOWNORMAL;
+  else if( strcmp(window, "min") == 0 )
+    win = SW_SHOWMINNOACTIVE;
+  else if( strcmp(window, "hide") == 0 )
+    win = SW_HIDE;
+  else {
+    ex.put_error("lswp.run: incorrect window state");
+    return ex.ret_num();
+  }
+
+  uint pid;
+  if( run(&pid, cmdl, pwd, prior, do_wait, win) )
+    ex.put_int(pid);
+  else
+    ex.put_error("lswp.run: can't start process");
 
   return ex.ret_num();
 LUA_CATCH(ex)
@@ -146,7 +183,7 @@ LUA_DEF_FUNCTION( sleep, L )
 {
   luaextn ex(L);
 LUA_TRY
-  int tm = (ex.arg_num() == 1) ? ex.get_int(1) : 0;
+  int tm = (ex.arg_num() >= 1) ? ex.get_int(1) : 0;
   Sleep(tm);
   return ex.ret_num();
 LUA_CATCH(ex)
@@ -248,9 +285,7 @@ LUA_CATCH(ex)
 LUA_BEGIN_LIBRARY(lswp)
   LUA_FUNCTION(gpf_off)
   LUA_FUNCTION(set_priority)
-  LUA_FUNCTION(run_min)
-  LUA_FUNCTION(run_hide)
-
+  LUA_FUNCTION(run)
   LUA_FUNCTION(sleep)
   LUA_FUNCTION(kill)
   LUA_FUNCTION(ps)
