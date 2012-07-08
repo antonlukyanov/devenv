@@ -10,6 +10,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include "ddraw.h"
 
 namespace lswg {
 
@@ -41,11 +42,26 @@ namespace {
   t_ring<int_point> mouse_ring(128);
   locker lmr;
 
+  LPDIRECTDRAW lpDD = 0;
+
+  void DoneDD(){
+    if( lpDD )
+      lpDD->Release();
+    lpDD = 0;
+  }
+
+  void waitblank()
+  {
+    if( lpDD )
+      lpDD->WaitForVerticalBlank(DDWAITVB_BLOCKBEGIN,NULL);
+  }
+
   void OnPaint( HWND hwnd ){
     PAINTSTRUCT ps;
     HDC wdc = BeginPaint(hwnd, &ps);
     RECT r = ps.rcPaint;
     lock_paint.lock();
+    waitblank();
     BitBlt(wdc, r.left, r.top, r.right-r.left, r.bottom-r.top, wnd_dc, r.left, r.top, SRCCOPY);
     lock_paint.unlock();
     EndPaint(hwnd, &ps);
@@ -53,9 +69,9 @@ namespace {
 
   void OnDestroy( HWND hwnd )
   {
+    DoneDD();
     PostQuitMessage(0);
   }
-
 
   void OnKey( HWND hwnd, UINT vk, BOOL down, int rep, UINT flags )
   {
@@ -146,6 +162,17 @@ public:
     SelectObject(wnd_dc, CreateCompatibleBitmap(wdc, cr_lx, cr_ly));
     SelectObject(pnt_dc, CreateCompatibleBitmap(wdc, cr_lx, cr_ly));
     ShowWindow(hwnd, SW_SHOW);
+
+    // Инициализация DirectDraw
+    HRESULT ddrval = DirectDrawCreate(NULL, &lpDD, NULL);
+    if( ddrval != DD_OK )
+      DoneDD();
+    if( lpDD ){
+      // Проверим, поддерживает ли видеокарта эту функцию?
+      HRESULT hr=lpDD->WaitForVerticalBlank(DDWAITVB_BLOCKBEGIN, NULL);
+      if( FAILED(hr) )
+        DoneDD();
+    }
 
     wnd_ready.set();
     MSG msg;
@@ -272,8 +299,8 @@ void wnd_setfont( const char* face, int size, bool bf, bool it )
   int weight = bf ? FW_BOLD : FW_NORMAL;
 
   HFONT font = CreateFont(
-    height, 0, 0, 0, weight, it, 0, 0, 
-    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
+    height, 0, 0, 0, weight, it, 0, 0,
+    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
     CLIP_DEFAULT_PRECIS, PROOF_QUALITY,
     DEFAULT_PITCH | FF_DONTCARE, face
   );
