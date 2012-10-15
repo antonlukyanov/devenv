@@ -29,7 +29,7 @@ void zzz( const char* fmt, ... )
 
 namespace {
   HWND hwnd;
-  event wnd_ready(event::OFF);
+  event wnd_ready;
 
   HDC wnd_dc, pnt_dc;
   locker lock_paint;
