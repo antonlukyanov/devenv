@@ -1,0 +1,18 @@
+Справка оригинальной recode.exe
+
+Usage: %s -{ai|ak|aw|ia|ik|iw|ka|ki|kw|wa|wi|wk}  [input_file [output_file]]
+       Parameters are:
+       -ai         - from Alternative to ISO,
+       -ak         - from Alternative to Koi8,
+       -aw         - from Alternative to Windows,
+       -ia         - from ISO to Alternative,
+       -ik         - from ISO to Koi8,
+       -iw         - from ISO to Windows,
+       -ka         - from Koi8 to Alternative,
+       -ki         - from Koi8 to ISO,
+       -kw         - from Koi8 to Windows,
+       -wa         - from Windows to Alternative,
+       -wi         - from Windows to ISO;
+       -wk         - from Windows to Koi8;
+       input_file  - name of input file,  may be "-" as standard input;
+       output_file - name of output file,  may be "-" as standard output.
