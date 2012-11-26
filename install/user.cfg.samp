@@ -2,4 +2,5 @@ return {
   mingw = "c:/MinGW",
   msys = "c:/msys",
   wxsrc = "d:/wx",
+  utils_dir = "h-utils",
 }
