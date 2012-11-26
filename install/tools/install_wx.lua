@@ -5,7 +5,7 @@ if not model then model = 'dll' end
 
 dofile('tools/istools.lua')
 
-wc_dir = get_cfg_path('utils_dir')
+wc_dir = get_cfg_path('devenv_dir')
 
 -- параметры
 
