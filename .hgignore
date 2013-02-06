@@ -63,3 +63,5 @@ third-party/luaiconv/*.a
 third-party/luaiconv/*.def
 obj/*.o
 revision.hg
+syntax: glob
+install/temp/standalone-lua
