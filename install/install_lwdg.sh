@@ -1,7 +1,15 @@
-if [ -n "$*" ]
+UNAME=`uname`
+
+if [[ $UNAME =~ "MINGW32_NT.*" ]]
 then
-  ./temp/standalone-lua.exe tools/install_lwdg.lua $*
+  SLUAINT=./temp/standalone-lua.exe
 else
-  ./temp/standalone-lua.exe tools/install_lwdg.lua setenv testprg createtree reglua lutils extutl localutl
+  SLUAINT=./temp/standalone-lua
 fi
 
+if [ -n "$*" ]
+then
+  $SLUAINT tools/install_lwdg.lua $*
+else
+  $SLUAINT tools/install_lwdg.lua setenv testprg createtree reglua lutils extutl localutl
+fi
