@@ -23,6 +23,8 @@ list = {
  { 'lutils/lib', 'lib/librepo.lua' },
  { 'lutils/lib', 'lib/libsys.lua' },
  { 'lutils/lib', 'lib/libwaki.lua' },
+ { 'lutils/lib', 'lib/libsert.lua' },
+ { 'lutils/lib', 'lib/liblxml.lua' },
 
  { 'lutils', 'luaht/luaht.lua' },
  { 'lutils', 'luaht/mkdoc.lua' },
