@@ -7,7 +7,7 @@ require "libcmdl"
 require "libfname"
 require "librepo"
 
-local copyright = 'lake: ver. 8.03, 2003 Aug, 2010 Mar, (c) ltwood'
+local copyright = 'lake: ver. 8.04, 2003 Aug, 2012 Mar, (c) ltwood'
 -- 7.02: r.3130
 -- 7.03: r.3131
 -- 7.04: r.3139
@@ -21,6 +21,7 @@ local copyright = 'lake: ver. 8.03, 2003 Aug, 2010 Mar, (c) ltwood'
 -- 8.01: r.3313
 -- 8.02: схема поиска базовой директории
 -- 8.03: вывод путей для файлов-дубликатов
+-- 8.04: добавлена опция '-c'
 
 local devel = false
 
@@ -392,7 +393,7 @@ local function run( cmdl, msg )
   end
 end
 
-local function do_make( rep, dep, do_buildall, do_strip )
+local function do_make( rep, dep, do_buildall, do_link, do_strip )
   local bp = get_param('basedir')
   local obj_list = {}
   local weights = {}
@@ -415,14 +416,16 @@ local function do_make( rep, dep, do_buildall, do_strip )
   )
   table.sort(obj_list, function(a, b) return weights[a] < weights[b] end)
 
-  local dst = get_param('dest')
-  if do_buildall or is_dst_updated(dst, obj_list) then
-    local cmdl, msg = get_param('link')(dst, obj_list)
-    if not run(cmdl, msg) then abort('shit happens!') end
-  end
-  if do_strip and is_param('strip') then
-    local cmdl, msg = get_param('strip')(dst)
-    if not run(cmdl, msg) then abort('shit happens!') end
+  if do_link then
+    local dst = get_param('dest')
+    if do_buildall or is_dst_updated(dst, obj_list) then
+      local cmdl, msg = get_param('link')(dst, obj_list)
+      if not run(cmdl, msg) then abort('shit happens!') end
+    end
+    if do_strip and is_param('strip') then
+      local cmdl, msg = get_param('strip')(dst)
+      if not run(cmdl, msg) then abort('shit happens!') end
+    end
   end
 end
 
@@ -609,6 +612,7 @@ lake_env = {
 local function main( action, lakefilename, options )
   run_param.is_verb = (options['-v'] ~= nil)
   run_param.is_dry = (options['-d'] ~= nil)
+  local do_link = (options['-c'] == nil)
   local do_strip = (options['-s'] ~= nil)
 
   local cwd = lfs.currentdir()
@@ -626,7 +630,7 @@ local function main( action, lakefilename, options )
   if action == 'pdep' then
     dep.print()
   elseif action == 'make' or action == 'build' then
-    do_make(rep, dep, action == 'build', do_strip)
+    do_make(rep, dep, action == 'build', do_link, do_strip)
   elseif action == 'export' then
     do_export(rep, dep)
     do_makefile(rep, dep)
@@ -644,6 +648,7 @@ if #arg ~= 2 then
   io.write'Options:\n'
   io.write'  -v  Verbose mode\n'
   io.write'  -d  Dry run\n'
+  io.write'  -c  Compile only\n'
   io.write'  -s  Strip executable\n'
   os.exit(1)
 end
