@@ -1,16 +1,49 @@
 -- installation support tools
 
+-- поддержка лога операций
+
+local log_fnm = istools.cwd() .. '/temp/install_lwdg.log'
+assert(io.open(log_fnm, 'wt')):close() -- создаем пустой файл
+
+function log( what )
+  local f = assert(io.open(log_fnm, 'at'))
+  f:write(what .. '\n')
+  f:close()
+end
+
+function msg( what )
+  io.write(what .. '\n')
+  log('# ' .. what)
+end
+
 -- обработка ошибок
 
 function stop( ... )
   local msg = string.format(...)
+
+  log('error: ', msg)
+
   io.write('\n')
   io.write('error: ', msg, '\n')
 
   io.write('\n')
-  io.write('something is wrong, installation was interrupted, press <Enter>\n')
+  io.write('some sort of shit happens, installation was interrupted, press <Enter>\n')
   io.read('*l')
   os.exit(1)
+end
+
+-- настройка среды выполнения
+
+local uname_val = assert(io.popen('uname -o')):read('*l')
+
+local function get_os_name()
+  if uname_val == 'GNU/Linux' then
+    return 'linux'
+  elseif uname_val == 'Msys' then
+    return 'mingw'
+  else
+    stop("unknown name of operating system")
+  end
 end
 
 -- работа с путями
@@ -43,6 +76,9 @@ function join( tbl )
   return res
 end
 
+-- Внимание! Здесь предполагается, что на два уровня вверх по файловой системе
+-- расположена корневая директория рабочего окружения.
+-- Это гарантируется запуском скрипта из директории install репозитория devenv.
 function calc_home()
   local cwd = norm_path(istools.cwd())
   local cwd_tbl = {}
@@ -50,27 +86,6 @@ function calc_home()
     table.insert(cwd_tbl, s)
   end
   return table.concat(cwd_tbl, '/', 1, #cwd_tbl - 2)
-end
-
--- поддержка лога операций
-
-local log_fnm = istools.cwd() .. '/temp/install_lwdg.log'
-assert(io.open(log_fnm, 'wt')):close()
-
-function log( what )
-  local f = assert(io.open(log_fnm, 'at'))
-  f:write(what .. '\n')
-  f:close()
-end
-
-function msg( what )
-  io.write(what .. '\n')
-  log('# ' .. what)
-end
-
-function exec( what )
-  log(what)
-  return os.execute(what)
 end
 
 -- файловая система
@@ -84,27 +99,49 @@ function is_file( nm )
   return res
 end
 
--- выполнение команд
-
-function execf_unp( ... )
-  return exec(string.format(...))
+function tmpfname()
+  return '.' .. os.tmpname()
 end
 
-function execf( ... )
-  if execf_unp(...) ~= 0 then
+function rmfile( nm )
+  local ok, msg = os.remove(nm)
+  if not ok then
+    stop("can't remove file <%s>: %s", nm, msg)
+  end
+end
+
+-- выполнение команд
+
+local function norm_cmd_name( cmd )
+  local os = get_os_name()
+  if os == 'mingw' then
+    return cmd:gsub('/', '\\')
+  else
+    return cmd
+  end
+end
+
+function execf_unp( cmd, ... )
+  local cmdl = norm_cmd_name(cmd) .. ' ' .. string.format(...)
+  log(cmdl)
+  return os.execute(cmdl)
+end
+
+function execf( cmd, ... )
+  if execf_unp(cmd, ...) ~= 0 then
     stop("can't execute <%s>", string.format(...))
   end
 end
 
-function cdrun(path, command)
+function cdrun( path, cmd, ... )
   local sp = istools.cwd()
   istools.chdir('../' .. path)
-  log('cd ' .. '../' .. path)
-  local res = exec(command)
+  log('cd ' .. '~/' .. path)
+  local res = execf_unp(cmd, ...)
   istools.chdir(sp)
-  log('cd ' .. norm_path(sp))
+  log('cd ' .. sp)
   if res ~= 0 then
-    stop("can't run <%s> at <%s>", command, path)
+    stop("can't run <%s> in <%s>", cmd, path)
   end
 end
 
@@ -112,7 +149,7 @@ function lua_make( path, script )
   local cwd = istools.cwd()
   std_lua = cwd .. "/temp/standalone-lua.exe"
   script = script or 'make.lua'
-  cdrun(path, std_lua .. ' ' .. script .. ' >nul')
+  cdrun(path, std_lua, script .. ' >nul')
 end
 
 -- ассоциации win32
@@ -124,11 +161,11 @@ function reg_ext( ext, typeid, act )
   act = act:gsub('/', '\\')
 
   -- delete /f = force
-  execf_unp('REG DELETE HKCU\\Software\\Classes\\%s /f 2>nul 1>nul', ext)
-  execf_unp('REG DELETE HKCU\\Software\\Classes\\%s /f 2>nul 1>nul', typeid)
+  execf_unp('REG', 'DELETE HKCU\\Software\\Classes\\%s /f 2>nul 1>nul', ext)
+  execf_unp('REG', 'DELETE HKCU\\Software\\Classes\\%s /f 2>nul 1>nul', typeid)
   -- add /ve = default parameter, /d = value
-  execf('REG ADD HKCU\\Software\\Classes\\%s /ve /d %s 2>nul 1>nul', ext, typeid)
-  execf('REG ADD HKCU\\Software\\Classes\\%s\\Shell\\Open\\command /ve /d "%s \\"%%1\\" %%*" 2>nul 1>nul', typeid, act)
+  execf('REG', 'ADD HKCU\\Software\\Classes\\%s /ve /d %s 2>nul 1>nul', ext, typeid)
+  execf('REG', 'ADD HKCU\\Software\\Classes\\%s\\Shell\\Open\\command /ve /d "%s \\"%%1\\" %%*" 2>nul 1>nul', typeid, act)
   istools.win32_update_config()
 end
 
@@ -148,15 +185,15 @@ end
 
 function set_user_env( var, val )
   -- delete /f = force delete, /v = parameter
-  execf_unp('REG DELETE HKCU\\Environment /v %s /f 2>nul 1>nul', var)
+  execf_unp('REG', 'DELETE HKCU\\Environment /v %s /f 2>nul 1>nul', var)
   -- add /v = parameter, /d = value
-  execf('REG ADD HKCU\\Environment /v %s /d "%s" 2>nul 1>nul', var, val)
+  execf('REG', 'ADD HKCU\\Environment /v %s /d "%s" 2>nul 1>nul', var, val)
   istools.win32_update_config()
 end
 
 function del_user_env( var )
   -- delete /f = force delete, /v = parameter
-  execf_unp('REG DELETE HKCU\\Environment /v %s /f 2>nul 1>nul', var)
+  execf_unp('REG', 'DELETE HKCU\\Environment /v %s /f 2>nul 1>nul', var)
   istools.win32_update_config()
 end
 
@@ -188,7 +225,7 @@ function get_cfg( var )
   end
 
   if not cfg[var] then
-    stop('cant find parameter <%s> in user configuration, please check file <user.cfg>', var)
+    stop("can't find parameter <%s> in user configuration, please check file <user.cfg>", var)
   end
   return cfg[var]
 end
