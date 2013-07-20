@@ -11,7 +11,7 @@ dofile('tools/istools.lua')
 do
   tasks = {}
   local tasks_str = ""
-  for j =1, #arg do
+  for j = 1, #arg do
     tasks[arg[j]] = true
     tasks_str = tasks_str .. arg[j] .. ' '
   end
@@ -129,8 +129,8 @@ if tasks['testprg'] then
 
   -- проверяем наличие программ
   function test_exist( prog, msg )
-    if exec(prog .. ' --version >nul 2>nul') ~= 0 then
-      stop("can't run <%s>, %s", prog, msg)
+    if execf_unp(prog, '--version >nul 2>nul') ~= 0 then
+      stop("can't run <%s>: %s", prog, msg)
     end
   end
 
@@ -145,14 +145,14 @@ if tasks['testprg'] then
 
   -- проверяем версии программ
   function test_ver( prog, ver )
-    local fn = '.' .. os.tmpname()
-    if exec(prog .. ' --version >' .. fn) ~= 0 then
+    local fn = tmpfname()
+    if execf_unp(prog, '--version >' .. fn) ~= 0 then
       stop("can't run <%s>", prog)
     end
     local file = assert(io.open(fn, 'rt'))
     local pver = file:read('*line')
     file:close()
-    os.remove(fn)
+    rmfile(fn)
 
     local pver_label = pver:match('(%d+%.%d+%.%d+)')
     local pver_l1, pver_l2, pver_l3 = pver:match('(%d+)%.(%d+)%.(%d+)')
@@ -179,11 +179,11 @@ end
 if tasks['createtree'] then
   msg "Creating directory tree..."
 
-  execf('sh -c "mkdir -p %s/include"', home)
-  execf('sh -c "mkdir -p %s/lib"', home)
-  execf('sh -c "mkdir -p %s/lutils/lib"', home)
-  execf('sh -c "mkdir -p %s/share"', home)
-  execf('sh -c "mkdir -p %s/utils"', home)
+  execf('sh', '-c "mkdir -p %s/include"', home)
+  execf('sh', '-c "mkdir -p %s/lib"', home)
+  execf('sh', '-c "mkdir -p %s/lutils/lib"', home)
+  execf('sh', '-c "mkdir -p %s/share"', home)
+  execf('sh', '-c "mkdir -p %s/utils"', home)
 end
 
 --
@@ -214,9 +214,9 @@ if tasks['extutl'] then
   -- собираем lua
   msg "  Building lua interpreter..."
   local lua_path = 'third-party/lua-addons/setup'
-  execf('cp temp/standalone-lua.exe ../%s', lua_path)
+  execf('cp', 'temp/standalone-lua.exe ../%s', lua_path)
   lua_make(lua_path, 'build_lua.lua')
-  os.remove('../' .. lua_path .. '/' .. 'standalone-lua.exe')
+  rmfile('../' .. lua_path .. '/' .. 'standalone-lua.exe')
 
   -- собираем libjpeg
   msg "  Building libjpeg..."
@@ -238,9 +238,9 @@ if tasks['extutl'] then
   -- компилируем специфичные lua-скрипты
   msg "  Building lua scripts..."
   local hlpath = '../lutils' --!!
-  execf('lua %s/lutils/luaccc.lua %s/utils/lred.lua >nul', home, hlpath)
-  execf('lua %s/lutils/luaccc.lua %s/llake/llake.lua >nul', home, hlpath)
-  execf('mv lred.exe llake.exe %s/utils', home)
+  execf('lua', '%s/lutils/luaccc.lua %s/utils/lred.lua >nul', home, hlpath)
+  execf('lua', '%s/lutils/luaccc.lua %s/llake/llake.lua >nul', home, hlpath)
+  execf('mv', 'lred.exe llake.exe %s/utils', home)
 
   -- собираем сторонние утилиты
   msg "  Building additional utilities..."
@@ -264,10 +264,10 @@ if tasks['localutl'] then
   msg "Building local utilities..."
 
   function make( path, name, dst )
-    cdrun(path, 'llake -s make build.llk 2>nul 1>nul')
+    cdrun(path, 'llake', '-s make build.llk 2>nul 1>nul')
     local src = '../' .. path .. '/' .. name
     local dst = home .. '/' .. dst
-    execf("mv %s %s", src, dst)
+    execf("mv", "%s %s", src, dst)
   end
 
   -- независимые от lwml утилиты
@@ -288,6 +288,6 @@ if tasks['localutl'] then
   -- копирование
 
   local hlc_path = '../lwml-dep/limcov'
-  execf('cp %s/limcov_dll.h %s/include', hlc_path, home)
-  execf('cp %s/limcov.a %s/lib/liblimcov.a', hlc_path, home)
+  execf('cp', '%s/limcov_dll.h %s/include', hlc_path, home)
+  execf('cp', '%s/limcov.a %s/lib/liblimcov.a', hlc_path, home)
 end

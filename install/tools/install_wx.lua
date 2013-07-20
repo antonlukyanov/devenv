@@ -28,7 +28,7 @@ msys = get_cfg_path('msys')
 mingw = get_cfg_path('mingw')
 wxsrc = get_cfg_path('wxsrc')
 
-execf('cp %s/etc/fstab temp', msys)
+execf('cp', '%s/etc/fstab temp', msys)
 
 file = assert(io.open(msys .. '/etc/fstab', 'wt'))
 file:write(mingw, ' /mingw\n')
@@ -52,6 +52,6 @@ w('make install')
 
 file:close()
 
-os.execute(msys .. '/bin/sh ./temp/install_wx.sh')
+execf(msys .. '/bin/sh', './temp/install_wx.sh')
 
-execf('cp temp/fstab %s/etc/fstab ', msys)
+execf('cp', 'temp/fstab %s/etc/fstab', msys)
