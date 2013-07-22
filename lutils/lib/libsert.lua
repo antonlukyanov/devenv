@@ -45,5 +45,9 @@ function serialize( t, level )
     end
   end
   indent(level)
-  io.write("},\n")
+  if level == 0 then
+    io.write("}\n")
+  else
+    io.write("},\n")
+  end
 end
