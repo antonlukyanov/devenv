@@ -4,50 +4,53 @@
   вывод таблицы в человеко-читаемой форме.
 --]]
 
-local function indent( level )
+local function indent( level, file )
   local tab_size = 2
-  io.write(string.rep(' ', level * tab_size))
+  file:write(string.rep(' ', level * tab_size))
 end
 
-local function out_key( k )
+local function out_key( k, file )
   if type(k) == 'number' or type(k) == 'boolean' then
-    io.write("[", k, "]")
+    file:write("[", k, "]")
   elseif type(k) == 'string' then
     if k:match('^[%_%a][%_%w]*$') then
-      io.write(k)
+      file:write(k)
     else
-      io.write("[", string.format("%q", k), "]")
+      file:write("[", string.format("%q", k), "]")
     end
   end
-  io.write(" = ")
+  file:write(" = ")
 end
 
-function serialize( t, level )
+function serialize( t, file, level )
+  if file == nil then
+    file = io.stdout
+  end
   if not level then level = 0 end
   if type(t) ~= 'table' then error("can't serialize a " .. type(t)) end
 
-  indent(level)
-  io.write("{\n")
+  indent(level, file)
+  file:write("{\n")
   for k, v in pairs(t) do
-    indent(level+1)
-    out_key(k)
+    indent(level+1, file)
+    out_key(k, file)
     if type(v) == "number" then
-      io.write(v, ',\n')
+      file:write(v, ',\n')
     elseif type(v) == "boolean" then
-      io.write(tostring(v), ',\n')
+      file:write(tostring(v), ',\n')
     elseif type(v) == "string" then
-      io.write(string.format("%q", v), ',\n')
+      file:write(string.format("%q", v), ',\n')
     elseif type(v) == 'table' then
-      io.write('\n')
-      serialize(v, level+1)
+      file:write('\n')
+      serialize(v, file, level+1)
     else
       error("cannot serialize a " .. type(o))
     end
   end
-  indent(level)
+  indent(level, file)
   if level == 0 then
-    io.write("}\n")
+    file:write("}\n")
   else
-    io.write("},\n")
+    file:write("},\n")
   end
 end
