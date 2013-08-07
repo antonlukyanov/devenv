@@ -10,14 +10,17 @@ local function indent( level, file )
 end
 
 local function out_key( k, file )
-  if type(k) == 'number' or type(k) == 'boolean' then
+  local kt = type(k)
+  if kt == 'number' or kt == 'boolean' then
     file:write("[", k, "]")
-  elseif type(k) == 'string' then
+  elseif kt == 'string' then
     if k:match('^[%_%a][%_%w]*$') then
       file:write(k)
     else
       file:write("[", string.format("%q", k), "]")
     end
+  else
+    error("cannot serialize a " .. kt .. " as a key")
   end
   file:write(" = ")
 end
@@ -34,17 +37,18 @@ function serialize( t, file, level )
   for k, v in pairs(t) do
     indent(level+1, file)
     out_key(k, file)
-    if type(v) == "number" then
+    local vt = type(v)
+    if vt == "number" then
       file:write(v, ',\n')
-    elseif type(v) == "boolean" then
+    elseif vt == "boolean" then
       file:write(tostring(v), ',\n')
-    elseif type(v) == "string" then
+    elseif vt == "string" then
       file:write(string.format("%q", v), ',\n')
-    elseif type(v) == 'table' then
+    elseif vt == 'table' then
       file:write('\n')
       serialize(v, file, level+1)
     else
-      error("cannot serialize a " .. type(o))
+      error("cannot serialize a " .. vt .. " as a value")
     end
   end
   indent(level, file)
