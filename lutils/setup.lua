@@ -24,6 +24,7 @@ list = {
  { 'lutils/lib', 'lib/libsys.lua' },
  { 'lutils/lib', 'lib/libwaki.lua' },
  { 'lutils/lib', 'lib/libsert.lua' },
+ { 'lutils/lib', 'lib/libsavet.lua' },
  { 'lutils/lib', 'lib/liblxml.lua' },
  { 'lutils/lib', '../third-party/json/json.lua' },
 
