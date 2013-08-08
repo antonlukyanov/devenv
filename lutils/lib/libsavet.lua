@@ -54,7 +54,7 @@ local function out_key( k, v, file )
   end
 end
 
-function save_table( t, file )
+function save_table( file, t )
   if file == nil then file = io.stdout end
   if type(t) ~= 'table' then error("can't serialize a " .. type(t)) end
 
@@ -70,7 +70,7 @@ function save_table( t, file )
     elseif vt == "string" then
       file:write(quot_str(v), '\n')
     elseif vt == 'table' then
-      save_table(v, file)
+      save_table(file, v)
     else
       error("cannot serialize a " .. type(v) .. " as a value")
     end
