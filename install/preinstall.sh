@@ -50,7 +50,7 @@ if [[ $UNAME =~ "MINGW32_NT.*" ]]
 then
   /mingw/bin/g++ -O2 -Wall -otemp/standalone-lua.exe $SRC_LIST $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c
   /mingw/bin/strip temp/standalone-lua.exe
-  rm $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c $TPU/lua51/src/linit.c
+  rm $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c
 else
   g++ -O2 -Wall -DLUA_USE_LINUX -otemp/standalone-lua $SRC_LIST $TPU/lua51/src/linit.c -ldl -lreadline
   strip temp/standalone-lua
