@@ -20,8 +20,13 @@ for s in mlist:gmatch('%S+') do
   mlist_p = mlist_p .. src_path .. s .. ' '
 end
 
+olist = ''
+for s in mlist:gmatch('%S+') do
+  olist = olist .. string.gsub(s, '(.*)%.c', '%1.o') .. ' '
+end
+
 __('gcc -c -D"INT32=long" -DALL_STATIC -Isrc -I. ' .. mlist_p)
-__('ar rcu libjpeg.a *.o' )
+__('ar rcu libjpeg.a ' .. olist )
 __('rm *.o' )
 
 
