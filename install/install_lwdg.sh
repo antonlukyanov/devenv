@@ -1,11 +1,15 @@
+#!/bin/sh
+
 UNAME=`uname`
 
-if [[ $UNAME =~ "MINGW32_NT.*" ]]
-then
-  SLUAINT=./temp/standalone-lua.exe
-else
-  SLUAINT=./temp/standalone-lua
-fi
+case $UNAME in
+  MINGW32_NT*)
+    SLUAINT=./temp/standalone-lua.exe
+  ;;
+  *)
+    SLUAINT=./temp/standalone-lua
+  ;;
+esac
 
 if [ -n "$*" ]
 then
