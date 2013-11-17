@@ -3,8 +3,6 @@ lwdg
   memleak.lua
   mktm.lua
   mkutest.lua
-  mkverinfo.lua
-  slog.lua
 utils
   ftwalk.lua
   lred.lua

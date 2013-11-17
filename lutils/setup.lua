@@ -9,7 +9,6 @@ list = {
  { 'lutils/lib', 'lib/libcmdl.lua' },
  { 'lutils/lib', 'lib/libcsv.lua' },
  { 'lutils/lib', 'lib/libdir.lua' },
- { 'lutils/lib', 'lib/libexport.lua' },
  { 'lutils/lib', 'lib/libfname.lua' },
  { 'lutils/lib', 'lib/libhistutl.lua' },
  { 'lutils/lib', 'lib/libhtml.lua' },
@@ -37,7 +36,6 @@ list = {
  { 'lutils', 'lwdg/find866.lua' },
  { 'lutils', 'lwdg/lakitall.lua' },
  { 'lutils', 'lwdg/rdep.lua' },
- { 'lutils', 'lwdg/lsvnsync.lua' },
  { 'lutils', 'lwdg/cpunver.lua' },
 
  { 'lutils', 'meta/luacc.lua' },
