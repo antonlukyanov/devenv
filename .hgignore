@@ -65,3 +65,4 @@ obj/*.o
 revision.hg
 syntax: glob
 install/temp/standalone-lua
+lualib/lswp/lswp.a
