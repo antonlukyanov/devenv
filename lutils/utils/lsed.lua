@@ -59,13 +59,23 @@ function sed_lines( fn, pat, repl )
   inf:close()
 
   local r = 0
-  local outf = io.open(fn, 'wt')
-  for _, s in ipairs(data) do
-    local res, count = s:gsub(pat, repl)
-    outf:write(res, '\n')
+  for i = 1, #data do
+    local res, count = data[i]:gsub(pat, repl)
+    if count > 0 then
+      data[i] = res
+    end
     r = r + count
   end
-  outf:close()
+
+  -- Запись файла только если были замены.
+  if r > 0 then
+    local outf = io.open(fn, 'wt')
+    for _, s in ipairs(data) do
+      outf:write(s, '\n')
+    end
+    outf:close()
+  end
+
   return r
 end
 
@@ -75,10 +85,12 @@ function sed_file( fn, pat, repl )
   local data = inf:read('*all')
   inf:close()
 
-  local outf = io.open(fn, 'wt')
   local res, count = data:gsub(pat, repl)
-  outf:write(res)
-  outf:close()
+  if count > 0 then
+    local outf = io.open(fn, 'wt')
+    outf:write(res)
+    outf:close()
+  end
   return count
 end
 
@@ -92,7 +104,12 @@ function sed( fn, pat, repl )
   return r
 end
 
+changed_count = 0
+files_count = 0
 for fn in pairs(list) do
   local count = sed(fn, pat, repl)
+  if count > 0 then changed_count = changed_count + 1 end
+  files_count = files_count + 1
   io.stdout:write(fn, ' ', count, '\n')
 end
+io.stdout:write(string.format('Changed %d of %d files.\n', changed_count, files_count))
