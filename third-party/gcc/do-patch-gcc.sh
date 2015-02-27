@@ -1,1 +1,1 @@
-patch --backup /mingw/lib/gcc/mingw32/4.6.2/include/float.h float.diff
+patch --backup /mingw/lib/gcc/mingw32/4.8.1/include/float.h float.diff
