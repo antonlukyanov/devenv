@@ -1,7 +1,9 @@
-use_rules('lwml/mingw.lru', { dll = true, static = true } )
+local p = require 'libplatform'
+
+use_rules('lwml/mingw.lru', { dll = true } )
 
 addpar{
   use = { },
   start = 'llogsrvdll.cc',
-  dest = 'llogsrv.dll',
+  dest = 'llogsrv.' .. (p.os_type == 'windows' and 'dll' or 'so'),
 }

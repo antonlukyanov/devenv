@@ -1,13 +1,54 @@
-#include <windows.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <stdarg.h>
+#include <cstring>
+#include <cstdlib>
 #include <time.h>
-#include <dir.h>
 #include <sys/stat.h>
 #include <time.h>
 
+#define OS_WIN   0
+#define OS_OSX   0
+#define OS_LINUX 0
+
+#ifdef __MINGW32__ || __MINGW64__
+  #define OS_WIN 1
+#elif __APPLE__
+  #define OS_OSX 1
+#elif __linux__
+  #define OS_LINUX 1
+#endif
+
+#if OS_WIN
+  #include <windows.h>
+  #include <dir.h>
+  #define cwd getcwd
+#else
+  #include <sys/syscall.h>
+  #include <sys/types.h>
+  #include <unistd.h>
+  #define cwd getcwd
+#endif
+
+#if OS_OSX
+  #include <mach-o/dyld.h>
+#endif
+
 // export
 
-#define EXPORT __attribute__((dllexport))
+#if OS_WIN
+  #ifdef __GNUC__ >= 4
+    #define EXPORT extern "C" __attribute__((dllexport))
+  #else
+    #define EXPORT extern "C" __declspec(dllexport)
+  #endif
+#else
+  #if __GNUC__ >= 4
+     #define EXPORT extern "C" __attribute__((visibility("default")))
+  #else
+     #define EXPORT extern "C"
+  #endif
+#endif
 
 typedef unsigned int uint;
 
@@ -102,7 +143,7 @@ namespace utils {
     return dst;
   }
 
-  // заменяем слэши на правильные
+  // Заменяем слэши на правильные.
   void norm_path( char* buf )
   {
     for( char* pch = buf; *pch; pch++ ){
@@ -111,11 +152,19 @@ namespace utils {
     }
   }
 
+  void remove_last_part(const char* s)
+  {
+    char* psl = strrchr(s, '/');
+    if( psl != 0 )
+      *psl = 0;
+  }
+
   const char* get_app_path()
   {
     static char buf[BUFLEN];
 
-    // получаем значение переменной среды или путь к приложению
+#if OS_WIN
+    // Получаем значение переменной среды или путь к приложению.
     const char* env = getenv("LWML_APP_HOME");
     if( env != 0 ){
       prot_strcpy(buf, env, BUFLEN);
@@ -124,15 +173,33 @@ namespace utils {
       int res = GetModuleFileName(0, buf, BUFLEN);
       if( res == 0 || res == BUFLEN )
         return 0;
-
-      norm_path(buf);
-
-      // убираем имя исполнимого файла
-      char* psl = strrchr(buf, '/');
-      if( psl == 0 )
-        return 0;
-      *psl = 0;
     }
+#elif OS_OSX
+    uint32_t size = BUFLEN;
+    if( _NSGetExecutablePath(buf, &size) != 0 ){
+        return 0;
+    }
+#else
+    const char* link_name = "/proc/self/exe";
+    const int ret = static_cast<int>(readlink(link_name, buf, BUFLEN - 1));
+
+    if( ret == -1 ){
+      return 0;
+    }
+
+    buf[ret] = 0;
+#endif
+
+    norm_path(buf);
+
+#if OS_OSX
+    static char out[BUFLEN];
+    realpath(buf, out);
+    strcpy(buf, out);
+#endif
+
+    // Убираем имя исполнимого файла.
+    remove_last_part(buf);
 
     return buf;
   }
@@ -140,28 +207,29 @@ namespace utils {
   const char* current_path()
   {
     static char buf[BUFLEN];
-    if( getcwd(buf, BUFLEN) == 0 )
+    if( cwd(buf, BUFLEN) == 0 )
       prot_sprintf(buf, BUFLEN, "unknown");
     return buf;
   }
 };
 
-// internal data and procs
+pthread_mutex_t log_m = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t dump_m = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t id_m = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t cnt_m = PTHREAD_MUTEX_INITIALIZER;
+
+// Internal data and procs
 
 namespace {
-  CRITICAL_SECTION log_cs;
   bool log_is_first_call = true;
   FILE* log_file = 0;
 
-  CRITICAL_SECTION dump_cs;
   bool dump_is_first_call = true;
   bool is_dump;
 
-  CRITICAL_SECTION id_cs;
   bool id_is_first_call = true;
   uint id_val;
 
-  CRITICAL_SECTION cnt_cs;
   bool cnt_is_first_call = true;
   uint cnt_val;
 
@@ -185,7 +253,11 @@ namespace {
 
   void out_log_rec( const char* asp, const char* msg )
   {
+#if OS_WIN
     fprintf(log_file, "%lu,", GetCurrentThreadId());
+#else
+    fprintf(log_file, "%d,", static_cast<int>(syscall(SYS_gettid)));
+#endif
     fprintf(log_file, "%ld,", clock());
     put_wrap(asp);
     fputc(',', log_file);
@@ -232,27 +304,25 @@ namespace {
 void llogsrv_log( const char* asp, const char* msg )
 {
   if( log_is_first_call ){
-    InitializeCriticalSection(&log_cs);
-    EnterCriticalSection(&log_cs);
+    pthread_mutex_lock(&log_m);
     open_log();
     log_is_first_call = false;
-    LeaveCriticalSection(&log_cs);
+    pthread_mutex_unlock(&log_m);
   }
   if( log_file ){
-    EnterCriticalSection(&log_cs);
+    pthread_mutex_lock(&log_m);
     out_log_rec(asp, msg);
-    LeaveCriticalSection(&log_cs);
+    pthread_mutex_unlock(&log_m);
   }
 }
 
 int llogsrv_isdump()
 {
   if( dump_is_first_call ){
-    InitializeCriticalSection(&dump_cs);
-    EnterCriticalSection(&dump_cs);
+    pthread_mutex_lock(&dump_m);
     is_dump = test_dump();
     dump_is_first_call = false;
-    LeaveCriticalSection(&dump_cs);
+    pthread_mutex_unlock(&dump_m);
   }
   return is_dump;
 }
@@ -260,11 +330,10 @@ int llogsrv_isdump()
 uint llogsrv_getid()
 {
   if( id_is_first_call ){
-    InitializeCriticalSection(&id_cs);
-    EnterCriticalSection(&id_cs);
+    pthread_mutex_lock(&id_m);
     id_val = time(0);
     id_is_first_call = false;
-    LeaveCriticalSection(&id_cs);
+    pthread_mutex_unlock(&id_m);
   }
   return id_val;
 }
@@ -272,14 +341,44 @@ uint llogsrv_getid()
 uint llogsrv_getct()
 {
   if( cnt_is_first_call ){
-    InitializeCriticalSection(&cnt_cs);
-    EnterCriticalSection(&cnt_cs);
+    pthread_mutex_lock(&cnt_m);
     cnt_val = 0;
     cnt_is_first_call = false;
-    LeaveCriticalSection(&cnt_cs);
+    pthread_mutex_unlock(&cnt_m);
   }
-  EnterCriticalSection(&cnt_cs);
+  pthread_mutex_lock(&cnt_m);
   ++cnt_val;
-  LeaveCriticalSection(&cnt_cs);
+  pthread_mutex_unlock(&cnt_m);
   return cnt_val;
 }
+
+#if OS_WIN
+  BOOL WINAPI DllMain
+  (
+    HINSTANCE hinstDLL,
+    DWORD fdwReason,
+    LPVOID lpReserved
+  )
+  {
+    switch (fdwReason)
+    {
+    case DLL_PROCESS_DETACH:
+      pthread_mutex_destroy(&log_m);
+      pthread_mutex_destroy(&dump_m);
+      pthread_mutex_destroy(&id_m);
+      pthread_mutex_destroy(&cnt_m);
+      break;
+    }
+
+    return TRUE;
+  }
+#else
+  __attribute__((destructor))
+  void llogsrv_destructor()
+  {
+    pthread_mutex_destroy(&log_m);
+    pthread_mutex_destroy(&dump_m);
+    pthread_mutex_destroy(&id_m);
+    pthread_mutex_destroy(&cnt_m);
+  }
+#endif

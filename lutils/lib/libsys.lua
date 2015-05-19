@@ -3,6 +3,7 @@
 --]]
 
 require "libmacro"
+require "libplatform"
 
 local function mk_cmdl( args )
   local tbl = {}
@@ -20,11 +21,13 @@ local function exec_unp( ... )
   return os.execute(cmdl)
 end
 
+local success_code = platform.get_success_code()
+
 local function exec( ... )
   local cmdl = mk_cmdl({...})
   io.write(cmdl .. '\n')
   local ret = os.execute(cmdl)
-  if ret ~= 0 then
+  if ret ~= success_code then
     io.write("libsys.exec: error: can't execute command\n")
     os.exit(3)
   end

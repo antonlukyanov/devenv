@@ -1,3 +1,5 @@
+#!/usr/bin/env lua
+
 --[[
   lake, (c) ltwood
 --]]
@@ -6,6 +8,7 @@ require "lfs"
 require "libcmdl"
 require "libfname"
 require "librepo"
+require "libplatform"
 
 local copyright = 'lake: ver. 8.04, 2003 Aug, 2012 Mar, (c) ltwood'
 -- 7.02: r.3130
@@ -24,6 +27,16 @@ local copyright = 'lake: ver. 8.04, 2003 Aug, 2012 Mar, (c) ltwood'
 -- 8.04: добавлена опция '-c'
 
 local devel = false
+local success_code = platform.get_success_code()
+local os_type = platform.get_os_type()
+
+local function exe_name( name )
+  return os_type == 'windows' and name .. '.exe' or name
+end
+
+local function dl_name( name )
+  return os_type == 'windows' and name .. '.dll' or name .. '.so'
+end
 
 -- печать таблицы
 local function pt( t )
@@ -46,9 +59,15 @@ end
 
 -- выполнение в защищенном окружении
 local function prot_run( fname, env )
-  local func = assert(loadfile(fname))
-  setfenv(func, env)
+  for k, v in pairs(_ENV) do
+    if env[k] == nil then
+      env[k] = v
+    end
+  end
+  
+  local func = assert(loadfile(fname, 'bt', env))
   func()
+  
   return env
 end
 
@@ -387,7 +406,7 @@ local function run( cmdl, msg )
     if msg then io.write(msg .. '\n') end
   end
   if not run_param.is_dry then
-    return (os.execute(cmdl) == 0)
+    return (os.execute(cmdl) == success_code)
   else
     return true
   end
@@ -604,7 +623,8 @@ lake_env = {
   cc = cc_tbl,
 
   abort = abort, run = run, subst = subst, split = fname.split,
-  addpar = addpar, use_rules = use_rules,
+  addpar = addpar, use_rules = use_rules, exe_name = exe_name,
+  dl_name = dl_name
 }
 
 -- main

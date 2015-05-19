@@ -11,7 +11,7 @@ case $UNAME in
     patch --output=$TPU/lua51/src/linit_istools.c $TPU/lua51/src/linit.c $TPU/lua-addons/istools/lua-istools.diff
     cp $TPU/lua-addons/istools/istools.c $TPU/lua51/src
   ;;
-  *)
+  Linux*)
     sudo apt-get install libreadline-dev
   ;;
 esac
