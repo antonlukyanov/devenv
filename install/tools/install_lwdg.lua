@@ -198,9 +198,14 @@ if tasks['setenv'] then
     
     -- Бэкап конфига.
     local rc_filepath = user_home .. '/' .. rc_name
-    execf('cp', '%s %s', rc_filepath, rc_filepath .. '.orig')
+    local rc_filepath_orig = rc_filepath .. '.orig'
     
-    -- Проверка на наличие строки загрузки .devenv. Если она есть, то ещё раз её писать не надо.
+    if not is_file(rc_filepath_orig) then
+      execf('cp', '%s %s', rc_filepath, rc_filepath_orig)
+    end
+    
+    -- Проверка на наличие строки загрузки .devenv в конфиге. Если она есть, то
+    -- ещё раз её писать не надо.
     local rc = assert(io.open(rc_filepath, 'r'))
     local rc_contents = rc:read('*a')
     rc:close()
