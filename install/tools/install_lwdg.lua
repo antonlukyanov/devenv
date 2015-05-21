@@ -234,7 +234,6 @@ if tasks['testprg'] then
     }
   else
     progs = {
-      ['sh'] = 'please, install sh',
       ['bash'] = 'please, install bash',
       ['strip'] = 'please, install strip',
       ['gcc'] = 'please, install gcc',
@@ -267,11 +266,18 @@ end
 if tasks['createtree'] then
   msg "Creating directory tree..."
 
-  execf('sh', '-c "mkdir -p %s/include"', home)
-  execf('sh', '-c "mkdir -p %s/lib"', home)
-  execf('sh', '-c "mkdir -p %s/lutils/lib"', home)
-  execf('sh', '-c "mkdir -p %s/share"', home)
-  execf('sh', '-c "mkdir -p %s/utils"', home)
+  local shell
+  if os_type == 'windows' then
+    shell = 'sh'
+  else
+    shell = 'bash'
+  end
+  
+  execf(shell, '-c "mkdir -p %s/include"', home)
+  execf(shell, '-c "mkdir -p %s/lib"', home)
+  execf(shell, '-c "mkdir -p %s/lutils/lib"', home)
+  execf(shell, '-c "mkdir -p %s/share"', home)
+  execf(shell, '-c "mkdir -p %s/utils"', home)
 end
 
 --
