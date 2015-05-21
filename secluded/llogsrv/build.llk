@@ -5,5 +5,5 @@ use_rules('lwml/mingw.lru', { dll = true } )
 addpar{
   use = { },
   start = 'llogsrvdll.cc',
-  dest = 'llogsrv.' .. (p.os_type == 'windows' and 'dll' or 'so'),
+  dest = dl_name('llogsrv'),
 }

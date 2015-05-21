@@ -102,13 +102,17 @@ end
 --
 
 local env = {
-  lwml_zzz  = ":log:dump:jit",
+  LWML_ZZZ  = ":log:dump:jit",
   LWDG_HOME = home,
   LUA_PATH  = string.format("%s;./?.lua;%s/lutils/?.lua;%s/lutils/lib/?.lua", package.path, home, home),
   LUA_CPATH = os_type == 'windows'
                 and string.format("%s;./?.dll;%s/share/?.dll", package.cpath, home)
                 or  string.format("%s;./?.so;%s/share/?.so", package.cpath, home),
 }
+
+if os_type ~= 'windows' then
+  env.LD_LIBRARY_PATH = home .. '/share:$LD_LIBRARY_PATH'
+end
 
 if tasks['setenv'] then
   msg "Setting environment variables..."
@@ -192,14 +196,24 @@ if tasks['setenv'] then
       stop('Could not determine shell type (supported: zsh, bash)')
     end
     
-    -- @Todo: сделать бэкап конфига.
-    -- @Todo: проверка на наличие строки загрузки .devenv.
-    local rc = assert(io.open(user_home .. '/' .. rc_name, 'a'))
-    rc:write('\n')
-    rc:write('if [ -f ~/.devenv ]; then source ~/.devenv; fi\n')
+    -- Бэкап конфига.
+    local rc_filepath = user_home .. '/' .. rc_name
+    execf('cp', '%s %s', rc_filepath, rc_filepath .. '.orig')
+    
+    -- Проверка на наличие строки загрузки .devenv. Если она есть, то ещё раз её писать не надо.
+    local rc = assert(io.open(filepath, 'r'))
+    local rc_contents = rc:read('*a')
     rc:close()
     
-    msg("  " .. rc_name .. ' was successfully updated')
+    if not rc_contents:match('source ~/%.devenv') then
+      rc = assert(io.open(rc_filepath, 'a'))
+      rc:write('\n')
+      rc:write('if [ -f ~/.devenv ]; then source ~/.devenv; fi\n')
+      rc:close()
+      msg("  " .. rc_name .. ' was successfully updated')
+    else
+      msg("  no need to update " .. rc_name)
+    end
   end
 end
 
@@ -287,20 +301,27 @@ if tasks['lutils'] then
     execf('cp', '%s/lutils/llake/llake.lua %s/lutils/llake.lua ', repo_home, home)
     execf('cp', '%s/lutils/utils/lred.lua %s/lutils/lred.lua ', repo_home, home)
     
+    -- Все файлы с расширением .lua.
     local cmd = fmt("find '%s/lutils' -type f -iname '*.lua' -maxdepth 1 | sed s,^./,,", home)
     local dir = assert(io.popen(cmd))
     
     for filepath in dir:lines() do
       -- Т.к. файлы небольшие, то можно считывать их в память и уже потом дописывать строку в начало.
-      -- @Todo: проверка на наличие #! в самом начале файла.
       local file = assert(io.open(filepath, 'r'))
       local script = file:read('*a')
       file:close()
       
-      file = assert(io.open(filepath ,'w'))
-      file:write('#!/usr/bin/env lua\n\n')
-      file:write(script)
-      file:close()
+      msg(filepath)
+      
+      local hashbang = '#!/usr/bin/env lua'
+      -- Проверяем есть ли #! в самом начале файла, если нет, то добавляем.
+      if not script:match('^' .. hashbang) then
+        file = assert(io.open(filepath ,'w'))
+        file:write(hashbang .. '\n\n')
+        file:write(script)
+        file:close()
+        msg("  added hashbang to the beginning.")
+      end 
       
       execf('chmod', 'u+x %s', filepath)
       
@@ -308,6 +329,9 @@ if tasks['lutils'] then
       local link_name = filepath:gsub('(.*)(%.lua)', '%1')
       if not is_file(link_name) then
         execf('ln', '-s %s %s', filepath, link_name)
+        msg("  created symlink.")
+      else
+        msg("  no need to create symlink.")
       end
     end
     
@@ -376,6 +400,8 @@ end
 if tasks['localutl'] then
   msg "Building local utilities..."
 
+  -- @Todo: переписать под Linux: lswg, lualwml, limlib.
+
   if os_type == 'windows' then
     -- Независимые от lwml утилиты.
     llake_make('secluded/ldatav', 'ldatav.exe', 'utils')
@@ -395,6 +421,6 @@ if tasks['localutl'] then
     execf('cp', '%s/limcov_dll.h %s/include', hlc_path, home)
     execf('cp', '%s/limcov.a %s/lib/liblimcov.a', hlc_path, home)
   else
-    llake_make('secluded/llogsrv', 'llogsrv.so', 'share')
+    llake_make('secluded/llogsrv', 'llogsrv', 'share')
   end
 end

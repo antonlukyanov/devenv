@@ -11,11 +11,14 @@
 #define OS_OSX   0
 #define OS_LINUX 0
 
-#ifdef __MINGW32__ || __MINGW64__
+#if defined(__MINGW32__ ) || defined(__MINGW64__)
+  #undef  OS_WIN
   #define OS_WIN 1
-#elif __APPLE__
+#elif defined(__APPLE__)
+  #undef  OS_OSX
   #define OS_OSX 1
-#elif __linux__
+#elif defined(__linux__)
+  #undef  OS_LINUX
   #define OS_LINUX 1
 #endif
 
