@@ -201,7 +201,7 @@ if tasks['setenv'] then
     execf('cp', '%s %s', rc_filepath, rc_filepath .. '.orig')
     
     -- Проверка на наличие строки загрузки .devenv. Если она есть, то ещё раз её писать не надо.
-    local rc = assert(io.open(filepath, 'r'))
+    local rc = assert(io.open(rc_filepath, 'r'))
     local rc_contents = rc:read('*a')
     rc:close()
     
