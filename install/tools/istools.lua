@@ -365,26 +365,3 @@ function del_env( var )
   del_user_env(var)
   set_proc_env(var, "")
 end
-
---
--- Файл локальной конфигурации пользователя
---
-
-local cfg = nil
-
-function get_cfg( var )
-  if not cfg then
-    local cfg_file = loadfile('user.cfg')
-    if not cfg_file then
-      stop("can't obtain user configuration, please check file <user.cfg>")
-    end
-    cfg = cfg_file()
-  end
-
-  if not cfg[var] then
-    stop("can't find parameter <%s> in user configuration, please check file <user.cfg>", var)
-  end
-  return cfg[var]
-end
-
-function get_cfg_path( var ) return norm_path(get_cfg(var)) end
