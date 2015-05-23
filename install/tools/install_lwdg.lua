@@ -313,7 +313,7 @@ if tasks['lutils'] then
     execf('cp', '%s/lutils/utils/lred.lua %s/lutils/lred.lua ', repo_home, home)
     
     -- Все файлы с расширением .lua.
-    local cmd = fmt("find '%s/lutils' -type f -iname '*.lua' -maxdepth 1 | sed s,^./,,", home)
+    local cmd = fmt("find '%s/lutils' -maxdepth 1 -type f -iname '*.lua' | sed s,^./,,", home)
     local dir = assert(io.popen(cmd))
     
     for filepath in dir:lines() do

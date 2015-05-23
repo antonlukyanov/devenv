@@ -27,15 +27,7 @@ case $UNAME in
     if [ -n "$*" ]; then
       $SLUA $install_lwdg $*
     else
-      $SLUA $install_lwdg setenv
-      
-      if [ -f $devenv ]; then
-        source $devenv
-      else
-        error "could not find ~/.devenv"
-      fi
-      
-      $SLUA $install_lwdg testprg createtree reglua lutils extutl localutl
+      $SLUA $install_lwdg testprg createtree lutils extutl localutl
     fi
   ;;
 esac
