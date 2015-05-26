@@ -6,8 +6,9 @@
   Во время инсталяцией следует использовать скрипт preinstall.sh, расположенный в репозитории.
 --]]
 
+fmt = string.format
 tpu_path = '../third-party'  -- from devenv/install
-lua_path = '$TPU/lua51/src'
+lua_path = '$TPU/lua52/src'
 
 lua_modules = dofile('../../third-party/lua-addons/setup/lua_modules.lua') -- from here
 
@@ -21,18 +22,17 @@ file:write("echo Building installation environment...\n\n")
 file:write('UNAME=`uname`\n')
 file:write('TPU=', tpu_path, '\n\n')
 
-file:write([=[
+file:write(fmt([[
 case $UNAME in
   MINGW32_NT*)
-    patch --output=$TPU/lua51/src/linit_istools.c $TPU/lua51/src/linit.c $TPU/lua-addons/istools/lua-istools.diff
-    cp $TPU/lua-addons/istools/istools.c $TPU/lua51/src
+    patch --output=%s/linit_istools.c %s/linit.c $TPU/lua-addons/istools/lua-istools.diff
+    cp $TPU/lua-addons/istools/istools.c %s
   ;;
   *)
-    sudo apt-get install libreadline-dev
+    # sudo apt-get install libreadline-dev
   ;;
 esac
-
-]=])
+]], lua_path, lua_path, lua_path))
 
 file:write('SRC_LIST="\n')
 for j, fn in ipairs(lua_modules) do
@@ -44,16 +44,16 @@ file:write('  ' .. lua_path .. '/lua.c"\n\n')
 
 file:write("echo Building temp/standalone-lua.exe...\n\n")
 
-file:write([=[
+file:write(fmt([=[
 if [[ $UNAME =~ "MINGW32_NT.*" ]]
 then
-  /mingw/bin/g++ -O2 -Wall -otemp/standalone-lua.exe $SRC_LIST $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c
-  /mingw/bin/strip temp/standalone-lua.exe
-  rm $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c
+  g++ -O2 -Wall -DLUA_COMPAT_MODULE -otemp/standalone-lua.exe $SRC_LIST %s/istools.c %s/linit_istools.c
+  strip temp/standalone-lua.exe
+  rm %s/istools.c %s/linit_istools.c
 else
-  g++ -O2 -Wall -DLUA_USE_LINUX -otemp/standalone-lua $SRC_LIST $TPU/lua51/src/linit.c -ldl -lreadline
+  g++ -O2 -Wall -DLUA_USE_LINUX -DLUA_COMPAT_MODULE -otemp/standalone-lua $SRC_LIST %s/linit.c -ldl -lreadline
   strip temp/standalone-lua
 fi
-]=])
+]=], lua_path, lua_path, lua_path, lua_path, lua_path))
 
 file:close()

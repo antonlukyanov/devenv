@@ -1,15 +1,15 @@
---- linit.c	Thu Dec 27 13:02:25 2007
-+++ linit_.c	Sun Aug 31 16:14:14 2008
-@@ -13,6 +13,7 @@
+--- linit.c	2013-04-12 21:48:47 +0300
++++ linit_istools.c	2015-05-25 15:46:40 +0300
+@@ -21,6 +21,7 @@
  #include "lualib.h"
  #include "lauxlib.h"
  
 +int luaopen_istools( lua_State *L );
  
- static const luaL_Reg lualibs[] = {
-   {"", luaopen_base},
-@@ -23,6 +24,7 @@
-   {LUA_STRLIBNAME, luaopen_string},
+ /*
+ ** these libs are loaded by lua.c and are readily available to any Lua
+@@ -37,6 +38,7 @@
+   {LUA_BITLIBNAME, luaopen_bit32},
    {LUA_MATHLIBNAME, luaopen_math},
    {LUA_DBLIBNAME, luaopen_debug},
 +  {"istools", luaopen_istools},

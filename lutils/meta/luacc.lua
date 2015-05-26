@@ -27,7 +27,7 @@
 function cc( dst, src )
   home = os.getenv('LWDG_HOME')
   local compiler = string.format(
-    "g++ -static -DLUA_BUILD_AS_DLL -L%s -I%s -o %s %s -llua51", 
+    "g++ -static -DLUA_BUILD_AS_DLL -L%s -I%s -o %s %s -llua52", 
     home..'/lib', home..'/include', dst, src
   )
   os.execute(compiler)
@@ -82,7 +82,7 @@ local function compile( do_strip, dst, ... )
   local src = { ... }
 
   local c_fn = '.' .. os.tmpname() .. '.cc'
-  local c_file = io.open(c_fn, 'wt')
+  local c_file = io.open(c_fn, 'w')
 
   c_file:write'// precompiled bytecode\n\n'
   for j = 1, #src do
@@ -124,7 +124,7 @@ if not package.loaded['luacc'] then
     os.exit()
   end
 
-  compile(do_strip, unpack(arg))
+  compile(do_strip, table.unpack(arg))
 else
   return luacc
 end

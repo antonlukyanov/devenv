@@ -29,12 +29,17 @@ end
 msg("Tasks: " .. tasks_str)
 
 -- Используется только под Linux и OSX.
-local user_home = get_env('HOME')
--- <...>/devenv
+local user_home = ''
+if os_type ~= 'windows' then
+  user_home = get_env('HOME')
+end
+
+  -- <...>/devenv
 local home = get_home_path()
 -- <...>/devenv/devenv-repository
 local repo_home = get_devenv_repo_path()
 local fmt = string.format
+
 
 --
 -- Сбрасываем переменные среды
@@ -308,6 +313,9 @@ if tasks['lutils'] then
   -- Копируем lua-утилиты.
   lua_make('lutils', 'setup.lua')
   
+  -- Под Linux и OSX не нужно собирать llake и lred в exe, поэтому для всех утилит
+  -- нужно создать симлинки без расширений и дописать в начало файла #!, чтобы
+  -- можно было запускать.
   if os_type ~= 'windows' then
     execf('cp', '%s/lutils/llake/llake.lua %s/lutils/llake.lua ', repo_home, home)
     execf('cp', '%s/lutils/utils/lred.lua %s/lutils/lred.lua ', repo_home, home)
@@ -369,7 +377,7 @@ if tasks['extutl'] then
   msg "  Building libtiff..."
   lua_make('third-party/libtiff')
 
-  if os_type == 'mingw' then
+  if os_type == 'windows' then
     -- Собираем lua.
     msg "  Building lua interpreter..."
     local lua_path = 'third-party/lua-addons/setup'
@@ -378,15 +386,19 @@ if tasks['extutl'] then
     rmfile('../' .. lua_path .. '/' .. 'standalone-lua.exe')
       
     -- Собираем сторонние lua-модули.
-    msg "  Building lua modules..."
+    msg "  Building lua module lfs"
     lua_make(lua_path, 'build_lfs.lua')
-    lua_make(lua_path, 'build_md5.lua')
+    
+    -- @Todo: с Lua 5.2 не собирается. Ругается на luaL_putchar().
+    -- msg "  Building lua module md5"
+    -- lua_make(lua_path, 'build_md5.lua')
     
     -- Компилируем специфичные lua-скрипты.
     msg "  Building lua scripts..."
-    local hlpath = '../lutils' --!!
-    execf('lua', '%s/lutils/luaccc.lua %s/utils/lred.lua >nul', home, hlpath)
-    execf('lua', '%s/lutils/luaccc.lua %s/llake/llake.lua >nul', home, hlpath)
+    
+    local hlpath = repo_home .. '/lutils'
+    execf('lua', '%s/lutils/luaccc.lua lred.exe %s/utils/lred.lua >nul', home, hlpath)
+    execf('lua', '%s/lutils/luaccc.lua llake.exe %s/llake/llake.lua >nul', home, hlpath)
     execf('mv', 'lred.exe llake.exe %s/utils', home)
     
     -- Собираем сторонние утилиты.
@@ -403,6 +415,12 @@ if tasks['extutl'] then
       lua_make('third-party/luaiconv')
     end
   end
+end
+
+if tasks['md5'] then
+  local lua_path = 'third-party/lua-addons/setup'
+  msg "Building lua module md5"
+  lua_make(lua_path, 'build_md5.lua')
 end
 
 --
@@ -422,9 +440,13 @@ if tasks['localutl'] then
     -- Зависимые от lwml утилиты.
     llake_make('lwml-dep/dllver', 'dllver.exe', 'utils')
     llake_make('lwml-dep/limcov', 'limcov.dll', 'share')
-    llake_make('lualib/lswg', 'lswg.dll', 'share')
-    llake_make('lualib/lswp', 'lswp.dll', 'share')
-    llake_make('lualib/lualwml', 'lualwml.dll', 'share')
+    
+    -- @Todo: исправить ошибки с многопоточностью.
+    -- llake_make('lualib/lswg', 'lswg.dll', 'share')
+    
+    -- @Todo: не собирается с Lua 5.2.
+    -- llake_make('lualib/lswp', 'lswp.dll', 'share')
+    -- llake_make('lualib/lualwml', 'lualwml.dll', 'share')
     llake_make('lwml-dep/lwhich', 'lwhich.exe', 'utils')
   
     -- Копирование.

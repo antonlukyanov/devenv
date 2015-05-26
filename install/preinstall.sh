@@ -8,53 +8,55 @@ TPU=../third-party
 
 case $UNAME in
   MINGW32_NT*)
-    patch --output=$TPU/lua51/src/linit_istools.c $TPU/lua51/src/linit.c $TPU/lua-addons/istools/lua-istools.diff
-    cp $TPU/lua-addons/istools/istools.c $TPU/lua51/src
+    patch --output=$TPU/lua52/src/linit_istools.c $TPU/lua52/src/linit.c $TPU/lua-addons/istools/lua-istools.diff
+    cp $TPU/lua-addons/istools/istools.c $TPU/lua52/src
   ;;
-  Linux*)
-    sudo apt-get install libreadline-dev
+  *)
+    # sudo apt-get install libreadline-dev
   ;;
 esac
-
 SRC_LIST="
-  $TPU/lua51/src/lapi.c \
-  $TPU/lua51/src/lauxlib.c \
-  $TPU/lua51/src/lbaselib.c \
-  $TPU/lua51/src/lcode.c \
-  $TPU/lua51/src/ldblib.c \
-  $TPU/lua51/src/ldebug.c \
-  $TPU/lua51/src/ldo.c \
-  $TPU/lua51/src/ldump.c \
-  $TPU/lua51/src/lfunc.c \
-  $TPU/lua51/src/lgc.c \
-  $TPU/lua51/src/liolib.c \
-  $TPU/lua51/src/llex.c \
-  $TPU/lua51/src/lmathlib.c \
-  $TPU/lua51/src/lmem.c \
-  $TPU/lua51/src/loadlib.c \
-  $TPU/lua51/src/lobject.c \
-  $TPU/lua51/src/lopcodes.c \
-  $TPU/lua51/src/loslib.c \
-  $TPU/lua51/src/lparser.c \
-  $TPU/lua51/src/lstate.c \
-  $TPU/lua51/src/lstring.c \
-  $TPU/lua51/src/lstrlib.c \
-  $TPU/lua51/src/ltable.c \
-  $TPU/lua51/src/ltablib.c \
-  $TPU/lua51/src/ltm.c \
-  $TPU/lua51/src/lundump.c \
-  $TPU/lua51/src/lvm.c \
-  $TPU/lua51/src/lzio.c \
-  $TPU/lua51/src/lua.c"
+  $TPU/lua52/src/lapi.c \
+  $TPU/lua52/src/lauxlib.c \
+  $TPU/lua52/src/lbaselib.c \
+  $TPU/lua52/src/lbitlib.c \
+  $TPU/lua52/src/lcode.c \
+  $TPU/lua52/src/lcorolib.c \
+  $TPU/lua52/src/lctype.c \
+  $TPU/lua52/src/ldblib.c \
+  $TPU/lua52/src/ldebug.c \
+  $TPU/lua52/src/ldo.c \
+  $TPU/lua52/src/ldump.c \
+  $TPU/lua52/src/lfunc.c \
+  $TPU/lua52/src/lgc.c \
+  $TPU/lua52/src/liolib.c \
+  $TPU/lua52/src/llex.c \
+  $TPU/lua52/src/lmathlib.c \
+  $TPU/lua52/src/lmem.c \
+  $TPU/lua52/src/loadlib.c \
+  $TPU/lua52/src/lobject.c \
+  $TPU/lua52/src/lopcodes.c \
+  $TPU/lua52/src/loslib.c \
+  $TPU/lua52/src/lparser.c \
+  $TPU/lua52/src/lstate.c \
+  $TPU/lua52/src/lstring.c \
+  $TPU/lua52/src/lstrlib.c \
+  $TPU/lua52/src/ltable.c \
+  $TPU/lua52/src/ltablib.c \
+  $TPU/lua52/src/ltm.c \
+  $TPU/lua52/src/lundump.c \
+  $TPU/lua52/src/lvm.c \
+  $TPU/lua52/src/lzio.c \
+  $TPU/lua52/src/lua.c"
 
 echo Building temp/standalone-lua.exe...
 
 if [[ $UNAME =~ "MINGW32_NT.*" ]]
 then
-  /mingw/bin/g++ -O2 -Wall -otemp/standalone-lua.exe $SRC_LIST $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c
-  /mingw/bin/strip temp/standalone-lua.exe
-  rm $TPU/lua51/src/istools.c $TPU/lua51/src/linit_istools.c
+  g++ -O2 -Wall -DLUA_COMPAT_MODULE -otemp/standalone-lua.exe $SRC_LIST $TPU/lua52/src/istools.c $TPU/lua52/src/linit_istools.c
+  strip temp/standalone-lua.exe
+  rm $TPU/lua52/src/istools.c $TPU/lua52/src/linit_istools.c
 else
-  g++ -O2 -Wall -DLUA_USE_LINUX -otemp/standalone-lua $SRC_LIST $TPU/lua51/src/linit.c -ldl -lreadline
+  g++ -O2 -Wall -DLUA_COMPAT_MODULE -DLUA_USE_LINUX -otemp/standalone-lua $SRC_LIST $TPU/lua52/src/linit.c -ldl -lreadline
   strip temp/standalone-lua
 fi

@@ -5,10 +5,11 @@ __ = sys.exec
 
 home = os.getenv('LWDG_HOME')
 
+dst = ''
 if platform.os_type ~= 'windows' then
-  local dst = 'ccalc'
+  dst = 'ccalc'
 else
-  local dst = 'ccalc.exe'
+  dst = 'ccalc.exe'
 end
 
 __('g++ -static -Wno-write-strings -o ' .. dst .. ' ccalc.cpp')

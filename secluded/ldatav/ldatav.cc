@@ -13,10 +13,10 @@
 
 /*#lake:res:ldatav_win*/
 
-#ifdef _MSC_VER
-#define for if(true) for
-#define _argc __argc
-#define _argv __argv
+#ifdef _WIN32
+  #define for if(true) for
+  #define _argc __argc
+  #define _argv __argv
 #endif
 
 // data const

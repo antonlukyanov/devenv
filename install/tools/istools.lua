@@ -9,7 +9,9 @@ os_type = platform.get_os_type()
 -- Файловая система
 --
 
-lfs = require 'lfs'
+if os_type ~= 'windows' then
+  lfs = require 'lfs'
+end
 
 --- Проверка файла на существование в файловой системе.
 function is_file( nm )
@@ -22,11 +24,11 @@ function is_file( nm )
 end
 
 function cwd()
-  return lfs.currentdir()
+  return os_type == 'windows' and istools.cwd() or lfs.currentdir()
 end
 
 function chdir( path )
-  return lfs.chdir(path)
+  return os_type == 'windows' and istools.chdir(path) or lfs.chdir(path)
 end
 
 function mkfile( filepath )
@@ -97,6 +99,8 @@ function test_exist( prog, msg )
                  or  '--version >/dev/null 2>/dev/null'
   if execf_unp(prog, args) ~= success_code then
     stop("can't run <%s>: %s", prog, msg)
+  else
+    print('  ' .. prog .. ': OK')
   end
 end
 
@@ -193,7 +197,7 @@ function get_home_path()
   
   local home = table.concat(cwd_tbl, '/', 1, #cwd_tbl - 2)
   
-  if os ~= 'windows' then
+  if os_type ~= 'windows' then
     home = '/' .. home
   end
   
@@ -210,7 +214,7 @@ function get_devenv_repo_path()
   
   local home = table.concat(cwd_tbl, '/', 1, #cwd_tbl - 1)
   
-  if os ~= 'windows' then
+  if os_type ~= 'windows' then
     home = '/' .. home
   end
   
