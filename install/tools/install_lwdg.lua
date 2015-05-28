@@ -34,7 +34,7 @@ if os_type ~= 'windows' then
   user_home = get_env('HOME')
 end
 
-  -- <...>/devenv
+-- <...>/devenv
 local home = get_home_path()
 -- <...>/devenv/devenv-repository
 local repo_home = get_devenv_repo_path()
@@ -116,7 +116,7 @@ local env = {
 }
 
 if os_type ~= 'windows' then
-  env.LD_LIBRARY_PATH = home .. '/share:$LD_LIBRARY_PATH'
+  env.LD_LIBRARY_PATH = home .. '/share'
 end
 
 if tasks['setenv'] then
@@ -173,7 +173,7 @@ if tasks['setenv'] then
     -- ! зачем нужна переменная среды pathext?
     
     for k, v in pairs(env) do
-      devenv:write('export ', k, "='", v, "'", '\n')
+      devenv:write('export ', k, "='", v, "':$", k, '\n')
     end
     devenv:write('\n')
     
