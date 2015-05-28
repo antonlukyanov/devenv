@@ -40,7 +40,6 @@ local home = get_home_path()
 local repo_home = get_devenv_repo_path()
 local fmt = string.format
 
-
 --
 -- Сбрасываем переменные среды
 --
@@ -173,7 +172,7 @@ if tasks['setenv'] then
     -- ! зачем нужна переменная среды pathext?
     
     for k, v in pairs(env) do
-      devenv:write('export ', k, "='", v, "':$", k, '\n')
+      devenv:write('export ', k, "='", v, "'\n")
     end
     devenv:write('\n')
     
