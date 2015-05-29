@@ -9,10 +9,6 @@ os_type = platform.get_os_type()
 -- Файловая система
 --
 
-if os_type ~= 'windows' then
-  lfs = require 'lfs'
-end
-
 --- Проверка файла на существование в файловой системе.
 function is_file( nm )
   local file = io.open(nm, 'rb')
@@ -24,11 +20,11 @@ function is_file( nm )
 end
 
 function cwd()
-  return os_type == 'windows' and istools.cwd() or lfs.currentdir()
+  return istools.cwd()
 end
 
 function chdir( path )
-  return os_type == 'windows' and istools.chdir(path) or lfs.chdir(path)
+  return istools.chdir(path)
 end
 
 function mkfile( filepath )
@@ -286,7 +282,7 @@ function lua_make( path, script )
   
   local to_null = os_type == 'windows' and ' >nul' or ' >/dev/null'
   
-  cdrun(path, std_lua, script .. to_null)
+  cdrun(path, std_lua, script)
 end
 
 local home = get_home_path()

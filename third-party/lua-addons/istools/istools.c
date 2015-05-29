@@ -1,9 +1,27 @@
 #include "lua.h"
 #include "lauxlib.h"
 
-#include <io.h>
+#define OS_WIN   0
+#define OS_OSX   0
+#define OS_LINUX 0
+
+#if defined(__MINGW32__ ) || defined(__MINGW64__)
+  #undef  OS_WIN
+  #define OS_WIN 1
+#elif defined(__APPLE__)
+  #undef  OS_OSX
+  #define OS_OSX 1
+#elif defined(__linux__)
+  #undef  OS_LINUX
+  #define OS_LINUX 1
+#endif
+
+#if OS_WIN
+  #include <io.h>
+  #include <windows.h>
+#endif
+
 #include <unistd.h>
-#include <windows.h>
 
 static int lua_chdir( lua_State *L )
 {
@@ -24,6 +42,8 @@ static int lua_cwd( lua_State *L )
     lua_pushstring(L, path);
   return 1;
 }
+
+#if OS_WIN
 
 static int lua_win32_update_config( lua_State *L )
 {
@@ -73,6 +93,16 @@ static const struct luaL_Reg istools_lib[] = {
   {"win32_get_user_path", lua_win32_get_user_path},
   {NULL, NULL},
 };
+
+#else
+
+static const struct luaL_Reg istools_lib[] = {
+  {"chdir", lua_chdir},
+  {"cwd", lua_cwd},
+  {NULL, NULL},
+};
+
+#endif
 
 int luaopen_istools( lua_State *L )
 {

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 function error() {
   msg="Error occurred during installation process"
@@ -22,7 +22,7 @@ case $UNAME in
     fi
   ;;
   Linux|Darwin*)
-    SLUA=lua
+    SLUA=./temp/standalone-lua
     devenv=~/.devenv
     if [ -n "$*" ]; then
       $SLUA $install_lwdg $*

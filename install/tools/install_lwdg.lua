@@ -376,18 +376,26 @@ if tasks['extutl'] then
   msg "  Building libtiff..."
   lua_make('third-party/libtiff')
 
+  local lua_path = 'third-party/lua-addons/setup'
+  
+  -- Собираем lua.
+  msg "  Building lua interpreter..."
+  
   if os_type == 'windows' then
-    -- Собираем lua.
-    msg "  Building lua interpreter..."
-    local lua_path = 'third-party/lua-addons/setup'
     execf('cp', 'temp/standalone-lua.exe ../%s', lua_path)
     lua_make(lua_path, 'build_lua.lua')
     rmfile('../' .. lua_path .. '/' .. 'standalone-lua.exe')
-      
-    -- Собираем сторонние lua-модули.
-    msg "  Building lua module lfs"
-    lua_make(lua_path, 'build_lfs.lua')
-    
+  else
+    execf('cp', 'temp/standalone-lua ../%s', lua_path)
+    lua_make(lua_path, 'build_lua.lua')
+    rmfile('../' .. lua_path .. '/' .. 'standalone-lua')
+  end
+  
+  -- Собираем сторонние lua-модули.
+  msg "  Building lua module lfs"
+  lua_make(lua_path, 'build_lfs.lua')
+  
+  if os_type == 'windows' then
     -- @Todo: с Lua 5.2 не собирается. Ругается на luaL_putchar().
     -- msg "  Building lua module md5"
     -- lua_make(lua_path, 'build_md5.lua')
