@@ -16,7 +16,7 @@ if os_type == 'windows' then
   __("strip lfs.dll")
   __("mv lfs.dll " .. var.HOME .. '/share')
 elseif os_type == 'osx' then
-  __(var, "gcc -dynamiclib -flat_namespace -olfs.so -I${LUA_PATH} -L${HOME}/lib ${SPATH}/lfs.c -llua52")
+  __(var, "gcc -dynamiclib -flat_namespace -olfs.so -DLUA_COMPAT_ALL -DLUA_USE_MACOSX -I${LUA_PATH} -L${HOME}/share ${SPATH}/lfs.c -llua52")
   __("mv lfs.so " .. var.HOME .. '/share')
 else
   __(var, "gcc -O2 -fPIC -shared -olfs.so -DLUA_COMPAT_ALL -DLUA_USE_LINUX -I${LUA_PATH} -L${HOME}/share ${SPATH}/lfs.c -llua52")

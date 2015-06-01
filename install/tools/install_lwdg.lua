@@ -179,7 +179,8 @@ if tasks['setenv'] then
     for i, path in pairs(local_paths) do
       local_paths[i] = home .. '/' .. path
     end
-    devenv:write("export PATH='", table.concat(local_paths, ":"), "':$PATH")
+    devenv:write("export PATH='", table.concat(local_paths, ":"), "':$PATH\n")
+    devenv:write("export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH\n")
     
     if devenv then
       devenv:close()
