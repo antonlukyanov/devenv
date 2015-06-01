@@ -275,7 +275,7 @@ function lua_make( path, script )
   script = script or 'make.lua'
   
   if (os_type == 'linux' or os_type == 'osx') then
-    std_lua = 'lua'
+    std_lua = cwd .. "/temp/standalone-lua"
   else
     std_lua = cwd .. "/temp/standalone-lua.exe"
   end
