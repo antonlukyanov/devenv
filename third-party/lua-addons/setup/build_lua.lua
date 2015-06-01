@@ -32,41 +32,61 @@ if os_type == 'windows' then
   __("mv lua.exe " .. utils)
   __("mv luac.exe " .. utils)
   __("mv liblua52.a " .. lib)
-else
-  local defs
-  local libs
-  local flags
-  if os_type == 'osx' then
-    defs = '-DLUA_USE_MACOSX'
-    libs = '-lm -lreadline'
-    flags = '-dynamiclib -flat_namespace'
-  else
-    defs = '-DLUA_USE_LINUX'
-    libs = '-lm -ldl -lreadline'
-    flags = '-shared -fpic'
-  end
+elseif os_type == 'osx' then
+  local defs = '-DLUA_COMPAT_ALL -DLUA_USE_MACOSX'
+  local libs = '-lm -lreadline'
+  local fpic = ''
+  local flags = '-dynamiclib -flat_namespace'
 
   for _, fn in ipairs(lua_modules) do
     mlist = mlist .. src_path .. fn .. '.c '
     olist = olist .. fn .. '.o '
-    __("gcc -O2 -Wall -DLUA_COMPAT_ALL " .. defs .. " -c " .. src_path .. fn .. ".c -o " .. fn .. ".o")
+    __("gcc " .. fpic .. " -O2 -Wall " .. defs .. " -c " .. src_path .. fn .. ".c -o " .. fn .. ".o")
   end
   
   __("ar rcu liblua52.a " .. olist)
   __("ranlib liblua52.a")
   __("rm " .. olist)
 
-  __("gcc -O2 -Wall -DLUA_COMPAT_ALL " .. defs .. " -c " .. src_path .. "lua.c -o lua.o")
-  __("gcc -O2 -Wall -DLUA_COMPAT_ALL " .. defs .. " -c -o lua.o " .. src_path .. "lua.c");
+  __("gcc -O2 -Wall " .. defs .. " -c " .. src_path .. "lua.c -o lua.o")
+  __("gcc -O2 -Wall " .. defs .. " -c -o lua.o " .. src_path .. "lua.c");
   __("gcc -o lua lua.o liblua52.a " .. libs);
   
-  __("gcc -O2 -Wall -DLUA_COMPAT_ALL -DLUA_USE_MACOSX -c " .. src_path .. "luac.c -o luac.o")
-  __("gcc -O2 -Wall -DLUA_COMPAT_ALL -DLUA_USE_MACOSX -c -o luac.o " .. src_path .. "luac.c");
+  __("gcc -O2 -Wall " .. defs .. " -c " .. src_path .. "luac.c -o luac.o")
+  __("gcc -O2 -Wall " .. defs .. " -c -o luac.o " .. src_path .. "luac.c");
   __("gcc -o luac luac.o liblua52.a " .. libs);
 
-  __("gcc " .. flags .. " -o liblua52 -O2 -Wall -DLUA_COMPAT_ALL " .. defs .. " " .. mlist .. "")
+  __("gcc " .. flags .. " -o liblua52.so -O2 -Wall " .. defs .. " " .. mlist .. "")
   
-  __("mv liblua52 " .. share)
+  __("mv liblua52.so " .. share)
+  __("mv liblua52.a " .. lib)
+  __("mv lua " .. utils)
+  __("mv luac " .. utils)
+else
+  local defs = '-DLUA_COMPAT_ALL -DLUA_USE_LINUX'
+  local libs = '-lm -ldl -lreadline'
+  local fpic = '-fpic'
+  local flags = '-shared -fpic -Wl,-E'
+
+  for _, fn in ipairs(lua_modules) do
+    mlist = mlist .. src_path .. fn .. '.c '
+    olist = olist .. fn .. '.o '
+  end
+  
+  __("gcc -fPIC -O2 -Wall " .. defs .. " -c " .. mlist)
+  __("ar rcu liblua52.a " .. olist)
+  __("ranlib liblua52.a")
+  
+  __("gcc " .. flags .. " -o liblua52.so -O2 -Wall " .. defs .. " " .. olist .. "")
+  __("rm " .. olist)
+
+  __("gcc -O2 -Wall " .. defs .. " -c -o lua.o " .. src_path .. "lua.c");
+  __("gcc -o lua lua.o liblua52.so " .. libs);
+  
+  __("gcc -O2 -Wall " .. defs .. " -c -o luac.o " .. src_path .. "luac.c");
+  __("gcc -o luac luac.o liblua52.a " .. libs);
+  
+  __("mv liblua52.so " .. share)
   __("mv liblua52.a " .. lib)
   __("mv lua " .. utils)
   __("mv luac " .. utils)

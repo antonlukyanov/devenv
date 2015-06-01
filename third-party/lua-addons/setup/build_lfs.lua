@@ -14,9 +14,12 @@ var = {
 if os_type == 'windows' then
   __(var, "g++ -static -shared -olfs.dll -DLUA_BUILD_AS_DLL -I${LUA_PATH} -L${HOME}/lib ${SPATH}/lfs.c -llua52")
   __("strip lfs.dll")
-  __("mv lfs.dll " .. var.HOME..'/share')
+  __("mv lfs.dll " .. var.HOME .. '/share')
 elseif os_type == 'osx' then
-  __(var, "gcc -dynamiclib -flat_namespace -olfs.so -DLUA_USE_LINUX -I${LUA_PATH} -L${HOME}/lib ${SPATH}/lfs.c -llua52")
-  __("mv lfs.so " .. var.HOME..'/share')
+  __(var, "gcc -dynamiclib -flat_namespace -olfs.so -I${LUA_PATH} -L${HOME}/lib ${SPATH}/lfs.c -llua52")
+  __("mv lfs.so " .. var.HOME .. '/share')
+else
+  __(var, "gcc -O2 -fPIC -shared -olfs.so -DLUA_COMPAT_ALL -DLUA_USE_LINUX -I${LUA_PATH} -L${HOME}/share ${SPATH}/lfs.c -llua52")
+  __("mv lfs.so " .. var.HOME .. '/share')
 end
 
