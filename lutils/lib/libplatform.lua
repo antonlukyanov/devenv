@@ -18,20 +18,16 @@ local function get_os_type()
   end
 end
 
+local os_type = get_os_type()
+
 --- Возвращает значение для сравнения результата работы функции os.execute().
 local function get_success_code()
-  local code
-  if os == 'mingw' then
-    code = 0
-  else
-    code = true
-  end
-  return code
+  return true
 end
 
 platform = {
   uname = uname_val,
-  os_type = get_os_type(),
+  os_type = os_type,
   get_os_type = get_os_type,
   get_success_code = get_success_code,
 }
