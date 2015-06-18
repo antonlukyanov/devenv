@@ -12,7 +12,7 @@ var = {
 }
 
 if os_type == 'windows' then
-  __(var, "g++ -static -shared -olfs.dll -DLUA_BUILD_AS_DLL -I${LUA_PATH} -L${HOME}/lib ${SPATH}/lfs.c -llua52")
+  __(var, "gcc -static -shared -olfs.dll -DLUA_BUILD_AS_DLL -DLUA_COMPAT_ALL -I${LUA_PATH} -L${HOME}/lib ${SPATH}/lfs.c -llua52")
   __("strip lfs.dll")
   __("mv lfs.dll " .. var.HOME .. '/share')
 elseif os_type == 'osx' then

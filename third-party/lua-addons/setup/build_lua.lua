@@ -22,9 +22,9 @@ for _, fn in ipairs(lua_modules) do
 end
 
 if os_type == 'windows' then
-  __("g++ -static -shared -Wl,--out-implib,liblua52.a -o lua52.dll -O2 -Wall -DLUA_BUILD_AS_DLL " .. mlist .. " 2>nul")
-  __("g++ -static -o lua.exe -O2 -Wall " .. src_path .. "lua.c liblua52.a")
-  __("g++ -static -o luac.exe -O2 -Wall " .. src_path .. "luac.c " .. mlist)
+  __("gcc -static -shared -Wl,--out-implib,liblua52.a -o lua52.dll -O2 -Wall -DLUA_COMPAT_ALL -DLUA_BUILD_AS_DLL " .. mlist .. " 2>nul")
+  __("gcc -static -o lua.exe -O2 -Wall " .. src_path .. "lua.c liblua52.a")
+  __("gcc -static -o luac.exe -O2 -Wall " .. src_path .. "luac.c " .. mlist)
   __("strip --strip-unneeded lua52.dll lua.exe luac.exe")
   
   __("mv lua52.dll " .. share)
