@@ -449,8 +449,7 @@ if tasks['localutl'] then
     llake_make('lwml-dep/dllver', 'dllver.exe', 'utils')
     llake_make('lwml-dep/limcov', 'limcov.dll', 'share')
     
-    -- @Todo: исправить ошибки с многопоточностью.
-    -- llake_make('lualib/lswg', 'lswg.dll', 'share')
+    llake_make('lualib/lswg', 'lswg.dll', 'share')
     
     -- @Todo: не собирается с Lua 5.2.
     -- llake_make('lualib/lswp', 'lswp.dll', 'share')
