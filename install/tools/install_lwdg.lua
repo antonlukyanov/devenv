@@ -460,6 +460,7 @@ if tasks['localutl'] then
     local hlc_path = '../lwml-dep/limcov'
     execf('cp', '%s/limcov_dll.h %s/include', hlc_path, home)
     execf('cp', '%s/limcov.a %s/lib/liblimcov.a', hlc_path, home)
+    execf('cp', '../lualib/lswg/lswg.a %s/lib/liblswg.a', home)
   else
     llake_make('secluded/llogsrv', 'llogsrv', 'share')
   end
