@@ -1,10 +1,16 @@
-home = os.getenv('LWDG_HOME')
+local home
 
-function copy( dst, src )
-  os.execute('cp ' .. './'..src .. ' ' .. home..'/'..dst)
+if #arg ~= 0 then
+  home = arg[1]
+else
+  home = os.getenv('LWDG_HOME')
 end
 
-list = {
+local function copy( dst, src )
+  os.execute('cp ' .. './' .. src .. ' ' .. home .. '/' ..dst)
+end
+
+local list = {
  { 'lutils/lib', 'lib/libawk.lua' },
  { 'lutils/lib', 'lib/libcmdl.lua' },
  { 'lutils/lib', 'lib/libcsv.lua' },
@@ -19,6 +25,7 @@ list = {
  { 'lutils/lib', 'lib/libluaps.lua' },
  { 'lutils/lib', 'lib/libmacro.lua' },
  { 'lutils/lib', 'lib/libmd5.lua' },
+ { 'lutils/lib', 'lib/libplatform.lua' },
  { 'lutils/lib', 'lib/librepo.lua' },
  { 'lutils/lib', 'lib/libsys.lua' },
  { 'lutils/lib', 'lib/libwaki.lua' },

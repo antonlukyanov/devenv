@@ -1,6 +1,0 @@
-return {
-  mingw = "c:/MinGW",
-  msys = "c:/msys",
-  wxsrc = "d:/wx",
-  devenv_dir = "h-utils",
-}

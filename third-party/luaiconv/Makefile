@@ -1,5 +1,5 @@
 # luaiconv - Performs character set conversions in Lua
-# (c) 2005-06 Alexandre Erwin Ittner <aittner@netuno.com.br>
+# (c) 2005-10 Alexandre Erwin Ittner <alexandre@ittner.com.br>
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -26,32 +26,47 @@
 #CC = gcc
 #RM = rm
 
-# Name of .pc file. "lua5.1" on Debian/Ubuntu
-LUAPKG = lua5.1
-CFLAGS = `pkg-config $(LUAPKG) --cflags` -O3 -Wall
-INSTALL_PATH = `pkg-config $(LUAPKG) --variable=INSTALL_CMOD`
-LIBS = `pkg-config $(LUAPKG) --libs`
+# Gives a nice speedup, but also spoils debugging on x86. Comment out this
+# line when debugging.
+OMIT_FRAME_PTR = -fomit-frame-pointer
 
-## If your system doesn't have pkg-config, comment out the previous lines and
-## uncomment and change the following ones according to your building
-## enviroment.
+LUABIN = lua
+LUAPKG = lua5.2
+CFLAGS = `pkg-config $(LUAPKG) --cflags` -fPIC -O3 -Wall $(OMIT_FRAME_PTR)
+LFLAGS = -shared
 
-#CFLAGS = -I/usr/include/lua5.1/ -O3 -Wall
-#LIBS = -llua5.1
-#INSTALL_PATH = /usr/lib/lua/5.1
+INSTALL_PATH = `$(LUABIN) -e'                           \
+    for dir in package.cpath:gmatch("(/[^?;]+)?") do    \
+        io.write(dir)                                   \
+        os.exit(0)                                      \
+    end                                                 \
+    os.exit(1)                                          \
+'`
+
+## If your system doesn't have pkg-config or if you do not want to get the
+## install path from Lua, comment out the previous lines and uncomment and
+## change the following ones according to your building environment.
+
+#CFLAGS = -I/usr/local/include/ -fPIC -O3 -Wall $(OMIT_FRAME_PTR)
+#LFLAGS = -shared
+#INSTALL_PATH = /usr/local/lib/lua/5.2/
 
 
-iconv.so: luaiconv.c
-	$(CC) -o iconv.so -shared $(LIBS) $(CFLAGS) luaiconv.c
+all: iconv.so
+
+iconv.lo: luaiconv.c
+	$(CC) -o iconv.lo -c $(CFLAGS) luaiconv.c
+
+iconv.so: iconv.lo
+	$(CC) -o iconv.so $(LFLAGS) $(LIBS) iconv.lo
 
 install: iconv.so
 	make test
-	install -s iconv.so $(INSTALL_PATH)
+	install -D -s iconv.so $(DESTDIR)/$(INSTALL_PATH)/iconv.so
 
 clean:
-	$(RM) iconv.so
+	$(RM) iconv.so iconv.lo
 
 test: iconv.so test_iconv.lua
 	lua test_iconv.lua
 
-all: iconv.so

@@ -1,4 +1,6 @@
-require "luaiconv"
+-- -*- coding: utf-8 -*-
+
+local iconv = require("iconv")
 
 -- Set your terminal encoding here
 -- local termcs = "iso-8859-1"
@@ -93,7 +95,30 @@ function check_one(to, from, text)
 end
 
 check_one(termcs, "iso-8859-1", iso88591)
-check_one(termcs, "utf-8", utf8)
-check_one(termcs, "utf-16", utf16)
--- check_one(termcs, "EBCDIC-CP-ES", ebcdic)
+check_one(termcs, "utf8", utf8)
+check_one(termcs, "utf16", utf16)
+check_one(termcs, "EBCDIC-CP-ES", ebcdic)
 
+
+-- The library must never crash the interpreter, even if the user tweaks
+-- with the garbage collector methods.
+local cd = iconv.new("iso-8859-1", "utf-8")
+local _, e = cd:iconv("atenção")
+assert(e == nil, "Unexpected conversion error")
+local gc = getmetatable(cd).__gc
+gc(cd)
+local _, e = cd:iconv("atenção")
+assert(e == iconv.ERROR_FINALIZED, "Failed to detect double-freed objects")
+gc(cd)
+
+
+-- Test expected return values
+local cd = iconv.new("ascii", "utf-8")
+local _, e = cd:iconv("atenção")
+assert(e == iconv.ERROR_INVALID, "Unexpected return value for invalid conversion")
+
+
+local cd = iconv.new("iso-8859-1", "utf-8")
+local s, e = cd:iconv("atenção")
+assert(s == "aten\231\227o", "Unexpected result for valid conversion")
+assert(e == nil, "Unexpected return value for valid conversion")

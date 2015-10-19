@@ -174,7 +174,7 @@ public:
         DoneDD();
     }
 
-    wnd_ready.set();
+    wnd_ready.signal();
     MSG msg;
     while( GetMessage(&msg, 0, 0, 0) > 0 ){
       TranslateMessage(&msg);
@@ -195,7 +195,6 @@ void wnd_open( int lx, int ly, bool cr )
     return;
   referer<wnd_func> wfunc = wnd_func::create(lx, ly, cr);
   thr.reset(new(lwml_alloc) thread(wfunc));
-  thr->start();
   wnd_ready.wait();
 }
 

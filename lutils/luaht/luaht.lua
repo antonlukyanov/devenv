@@ -590,7 +590,7 @@ local function generate_html( src, inline )
   local dst = fname.merge(fnt.dir, fnt.name, dst_ext)
 
   ref_tbl = {}
-  outfile = assert(io.open(dst, "wt"))
+  outfile = assert(io.open(dst, "w"))
   if not google_site_mode then
     print_header(src)
   end

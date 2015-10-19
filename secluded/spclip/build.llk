@@ -1,4 +1,4 @@
-use_rules('lwml/mingw.lru', { gui = true, static = true })
+use_rules('lwml/cpp.lru', { gui = true, static = true })
 
 addpar{
   use = {},

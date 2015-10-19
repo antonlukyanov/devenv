@@ -1,7 +1,9 @@
 luacc_driver = [[
-#include <lauxlib.h>
-#include <lua.h>
-#include <lualib.h>
+extern "C" {
+  #include <lauxlib.h>
+  #include <lua.h>
+  #include <lualib.h>
+}
 
 #include <stdlib.h>
 #include <string.h>
