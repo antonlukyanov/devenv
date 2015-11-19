@@ -459,7 +459,7 @@ if tasks['localutl'] then
     
     -- @Todo: не собирается с Lua 5.2.
     -- llake_make('lualib/lswp', 'lswp.dll', 'share')
-    -- llake_make('lualib/lualwml', 'lualwml.dll', 'share')
+    llake_make('lualib/lualwml', 'lualwml.dll', 'share')
     llake_make('lwml-dep/lwhich', 'lwhich.exe', 'utils')
   
     -- Копирование.
@@ -469,5 +469,6 @@ if tasks['localutl'] then
     execf('cp', '../lualib/lswg/lswg.a %s/lib/liblswg.a', home)
   else
     llake_make('secluded/llogsrv', 'llogsrv', 'share')
+    llake_make('lualib/lualwml', 'lualwml', 'share')
   end
 end
