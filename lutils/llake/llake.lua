@@ -35,7 +35,7 @@ local function exe_name( name )
 end
 
 local function dl_name( name )
-  return os_type == 'windows' and name .. '.dll' or name
+  return os_type == 'windows' and name .. '.dll' or name .. '.so'
 end
 
 -- печать таблицы

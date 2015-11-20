@@ -393,7 +393,7 @@ if tasks['extutl'] then
 
     -- В OSX 10.11 (El Capitan) теперь DYLD_LIBRARY_PATH не экспортируется в дочерние процессы,
     -- приходится делать ссылку в папке usr/local/lib.
-    if os_type == 'osx' then
+    if os_type == 'osx' and not is_file('/usr/local/lib/liblua52.so') then
         execf('ln -s', home .. '/share/liblua52.so ' .. '/usr/local/lib')
     end
   end
@@ -468,7 +468,7 @@ if tasks['localutl'] then
     execf('cp', '%s/limcov.a %s/lib/liblimcov.a', hlc_path, home)
     execf('cp', '../lualib/lswg/lswg.a %s/lib/liblswg.a', home)
   else
-    llake_make('secluded/llogsrv', 'llogsrv', 'share')
-    llake_make('lualib/lualwml', 'lualwml', 'share')
+    llake_make('secluded/llogsrv', 'llogsrv.so', 'share')
+    llake_make('lualib/lualwml', 'lualwml.so', 'share')
   end
 end
