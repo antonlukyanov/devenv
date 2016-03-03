@@ -105,21 +105,21 @@ end
 -- Устанавливаем переменные среды
 --
 
-local env = {
-  LWML_ZZZ  = ":log:dump:jit",
-  LWDG_HOME = home,
-  LUA_PATH  = string.format("%s;./?.lua;%s/lutils/?.lua;%s/lutils/lib/?.lua", package.path, home, home),
-  LUA_CPATH = os_type == 'windows'
-                and string.format("%s;./?.dll;%s/share/?.dll", package.cpath, home)
-                or  string.format("%s;./?.so;%s/share/?.so", package.cpath, home),
-}
-
-if os_type ~= 'windows' then
-  env.LD_LIBRARY_PATH = home .. '/share'
-end
-
 if tasks['setenv'] then
   msg "Setting environment variables..."
+ 
+  local env = {
+    LWML_ZZZ  = ":log:dump:jit",
+    LWDG_HOME = home,
+    LUA_PATH  = string.format("%s;./?.lua;%s/lutils/?.lua;%s/lutils/lib/?.lua", package.path, home, home),
+    LUA_CPATH = os_type == 'windows'
+                  and string.format("%s;./?.dll;%s/share/?.dll", package.cpath, home)
+                  or  string.format("%s;./?.so;%s/share/?.so", package.cpath, home),
+  }
+  
+  if os_type ~= 'windows' then
+    env.LD_LIBRARY_PATH = home .. '/share'
+  end
   
   local local_paths = {
     'utils',

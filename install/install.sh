@@ -10,15 +10,15 @@ function error() {
 }
 
 UNAME=`uname`
-install_lwdg="tools/install_lwdg.lua"
+install_lwdg="tools/install.lua"
 
 case $UNAME in
   MINGW*)
     SLUA=./temp/standalone-lua.exe
     if [ -n "$*" ]; then
-      $SLUA tools/install_lwdg.lua $*
+    $SLUA $install_lwdg $*
     else
-      $SLUA tools/install_lwdg.lua setenv testprg createtree reglua lutils extutl localutl
+    $SLUA $install_lwdg setenv testprg createtree reglua lutils extutl localutl
     fi
   ;;
   Linux|Darwin*)
