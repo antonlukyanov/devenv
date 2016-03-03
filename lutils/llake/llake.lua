@@ -437,13 +437,18 @@ local function do_make( rep, dep, do_buildall, do_link, do_strip )
 
   if do_link then
     local dst = get_param('dest')
-    if do_buildall or is_dst_updated(dst, obj_list) then
-      local cmdl, msg = get_param('link')(dst, obj_list)
-      if not run(cmdl, msg) then abort('shit happens!') end
+    if type(dst) ~= 'table' then
+      dst = { dst }
     end
-    if do_strip and is_param('strip') then
-      local cmdl, msg = get_param('strip')(dst)
-      if not run(cmdl, msg) then abort('shit happens!') end
+    for _, dst_fn in ipairs(dst) do
+      if do_buildall or is_dst_updated(dst_fn, obj_list) then
+        local cmdl, msg = get_param('link')(dst_fn, obj_list)
+        if not run(cmdl, msg) then abort('shit happens!') end
+      end
+      if do_strip and is_param('strip') then
+        local cmdl, msg = get_param('strip')(dst_fn)
+        if not run(cmdl, msg) then abort('shit happens!') end
+      end
     end
   end
 end
