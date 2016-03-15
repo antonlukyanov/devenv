@@ -273,15 +273,15 @@ function lua_make( path, script )
   local std_lua
   
   script = script or 'make.lua'
+  local to_null = os_type == 'windows' and ' >nul' or ' &>/dev/null'
+  script = script .. to_null
   
   if (os_type == 'linux' or os_type == 'osx') then
     std_lua = cwd .. "/temp/standalone-lua"
   else
     std_lua = cwd .. "/temp/standalone-lua.exe"
   end
-  
-  local to_null = os_type == 'windows' and ' >nul' or ' >/dev/null'
-  
+    
   cdrun(path, std_lua, script)
 end
 
@@ -293,7 +293,7 @@ function llake_make( path, name, dst )
   if os_type == 'windows' then
     arguments = '-s make build.llk 2>nul 1>nul'
   else
-    arguments = 'make build.llk 2>/dev/null 1>/dev/null'
+    arguments = 'make build.llk &>/dev/null'
   end
   
   cdrun(path, 'llake', arguments)
