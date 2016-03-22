@@ -180,6 +180,14 @@ function join( tbl )
   return res
 end
 
+function get_filename( filepath )
+  local segment
+  for s in filepath:gmatch('[^/]+') do
+    segment = s
+  end
+  return segment
+end
+
 -- Внимание! Здесь предполагается, что на два уровня вверх по файловой системе
 -- расположена корневая директория рабочего окружения.
 -- Это гарантируется запуском скрипта из директории install репозитория devenv.

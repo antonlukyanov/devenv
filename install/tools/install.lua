@@ -308,7 +308,7 @@ end
 --
 
 if tasks['lutils'] then
-  msg "Building lua utilities..."
+  msg("Building lua utilities in " .. home .. '/lutils')
   
   -- Копируем lua-утилиты.
   lua_make('lutils', 'setup.lua')
@@ -319,7 +319,7 @@ if tasks['lutils'] then
   if os_type ~= 'windows' then
     execf('cp', '%s/lutils/llake/llake.lua %s/lutils/llake.lua ', repo_home, home)
     execf('cp', '%s/lutils/utils/lred.lua %s/lutils/lred.lua ', repo_home, home)
-    
+
     -- Все файлы с расширением .lua.
     local cmd = fmt("find '%s/lutils' -maxdepth 1 -type f -iname '*.lua' | sed s,^./,,", home)
     local dir = assert(io.popen(cmd))
@@ -327,10 +327,12 @@ if tasks['lutils'] then
     for filepath in dir:lines() do
       -- Т.к. файлы небольшие, то можно считывать их в память и уже потом дописывать строку в начало.
       local file = assert(io.open(filepath, 'r'))
+      local filename = get_filename(filepath)
       local script = file:read('*a')
+      local message = ''
       file:close()
       
-      msg(filepath)
+      message = filename .. ':'
       
       local hashbang = '#!/usr/bin/env lua'
       -- Проверяем есть ли #! в самом начале файла, если нет, то добавляем.
@@ -339,7 +341,6 @@ if tasks['lutils'] then
         file:write(hashbang .. '\n\n')
         file:write(script)
         file:close()
-        msg("  added hashbang to the beginning.")
       end 
       
       execf('chmod', 'u+x %s', filepath)
@@ -348,10 +349,11 @@ if tasks['lutils'] then
       local link_name = filepath:gsub('(.*)(%.lua)', '%1')
       if not is_file(link_name) then
         execf('ln', '-s %s %s', filepath, link_name)
-        msg("  created symlink.")
+        message = message .. "\tcreated symlink."
       else
-        msg("  no need to create symlink.")
+        message = message .. "\tsymlink exists."
       end
+      msg(message)
     end
     
     dir:close()
