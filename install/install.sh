@@ -27,6 +27,8 @@ case $UNAME in
     if [ -n "$*" ]; then
       $SLUA $install_lwdg $*
     else
+      $SLUA $install_lwdg setenv
+      source ~/.devenv
       $SLUA $install_lwdg testprg createtree lutils extutl localutl
     fi
   ;;
