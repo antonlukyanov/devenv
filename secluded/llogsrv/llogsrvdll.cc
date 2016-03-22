@@ -370,6 +370,8 @@ uint llogsrv_getct()
       pthread_mutex_destroy(&dump_m);
       pthread_mutex_destroy(&id_m);
       pthread_mutex_destroy(&cnt_m);
+      if( log_file )
+        fclose(log_file);
       break;
     }
 
@@ -383,5 +385,7 @@ uint llogsrv_getct()
     pthread_mutex_destroy(&dump_m);
     pthread_mutex_destroy(&id_m);
     pthread_mutex_destroy(&cnt_m);
+    if( log_file )
+      fclose(log_file);
   }
 #endif
