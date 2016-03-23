@@ -281,9 +281,9 @@ function lua_make( path, script )
   local std_lua
   
   script = script or 'make.lua'
-  local to_null = os_type == 'windows' and ' >nul' or ' &>/dev/null'
+  local to_null = os_type == 'windows' and ' >nul' or ' 1>/dev/null 2>/dev/null'
   script = script .. to_null
-  
+
   if (os_type == 'linux' or os_type == 'osx') then
     std_lua = cwd .. "/temp/standalone-lua"
   else
