@@ -1,36 +1,34 @@
 #!/usr/bin/env bash
 
-function error() {
-  msg="Error occurred during installation process"
-  if [ -n "$1" ]; then
-    $msg=": $1"
-  fi
-  echo $msg
-  exit 1
-}
-
-UNAME=`uname`
+uname=`uname`
 install_lwdg="tools/install.lua"
 
-case $UNAME in
+if [[ $uname == Linux* || $uname == Darwin* ]]; then
+  slua="./temp/standalone-lua"
+else
+  slua="./temp/standalone-lua.exe"
+fi
+
+if [ ! -f "$slua" ]; then
+  bash build_lua.sh
+fi
+
+case $uname in
   MINGW*)
-    SLUA=./temp/standalone-lua.exe
     if [ -n "$*" ]; then
-    $SLUA $install_lwdg $*
+      $slua $install_lwdg $*
     else
-    $SLUA $install_lwdg setenv testprg createtree reglua lutils extutl localutl
+      $slua $install_lwdg setenv testprg createtree reglua lutils extutl localutl
     fi
-  ;;
+    ;;
   Linux|Darwin*)
-    SLUA=./temp/standalone-lua
     devenv=~/.devenv
     if [ -n "$*" ]; then
-      $SLUA $install_lwdg $*
+      $slua $install_lwdg $*
     else
-      $SLUA $install_lwdg setenv
+      $slua $install_lwdg setenv
       source ~/.devenv
-      $SLUA $install_lwdg testprg createtree lutils extutl localutl
+      $slua $install_lwdg testprg createtree lutils extutl localutl
     fi
-  ;;
+    ;;
 esac
-
