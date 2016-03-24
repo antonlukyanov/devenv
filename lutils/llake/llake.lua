@@ -666,19 +666,32 @@ end
 
 local options = cmdl.options()
 
-if #arg ~= 2 then
+if options['-h'] ~= nil then
   io.write(copyright .. '\n')
-  io.write'Usage: lua llake.lua action lakefile [-v] [-d] [-s]\n'
+  io.write'Usage: lua llake.lua [action] [lakefile] [-v] [-d] [-s]\n'
   io.write'Actions: pdep, make, build, export\n'
   io.write'Options:\n'
   io.write'  -v  Verbose mode\n'
   io.write'  -d  Dry run\n'
   io.write'  -c  Compile only\n'
   io.write'  -s  Strip executable\n'
+  io.write'  -h  Display this help message\n'
+  io.write'llake can be run without arguments, default arguments are "make build.llk".\n'
+  io.write'If there is only one argument, then it is treated as a lakefile.\n'
   os.exit(1)
 end
 
-main(arg[1], arg[2], options)
+local action = 'make'
+local lakefilename = 'build.llk'
+
+if #arg == 1 then
+  lakefilename = arg[1]
+elseif #arg == 2 then
+  action = arg[1]
+  lakefilename = arg[2]
+end
+
+main(action, lakefilename, options)
 
 --[[
 --]]
