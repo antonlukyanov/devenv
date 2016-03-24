@@ -286,6 +286,7 @@ if tasks['createtree'] then
   execf(shell, '-c "mkdir -p %s/include"', home)
   execf(shell, '-c "mkdir -p %s/lib"', home)
   execf(shell, '-c "mkdir -p %s/lutils/lib"', home)
+  execf(shell, '-c "mkdir -p %s/lutils/rules"', home)
   execf(shell, '-c "mkdir -p %s/share"', home)
   execf(shell, '-c "mkdir -p %s/utils"', home)
 end
@@ -309,10 +310,10 @@ end
 
 if tasks['lutils'] then
   msg("Building lua utilities in " .. home .. '/lutils')
-  
+
   -- Копируем lua-утилиты.
   lua_make('lutils', 'setup.lua')
-  
+
   -- Под Linux и OSX не нужно собирать llake и lred в exe, поэтому для всех утилит
   -- нужно создать симлинки без расширений и дописать в начало файла #!, чтобы
   -- можно было запускать.

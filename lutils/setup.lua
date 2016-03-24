@@ -63,6 +63,8 @@ local list = {
  { 'lutils', 'utils/mkbinchunk.lua' },
  { 'lutils', 'utils/mktmpd.lua' },
  { 'lutils', 'utils/pwd.lua' },
+ 
+ { 'lutils/rules', 'rules/cpp.lru' },
 }
 
 for _, r in ipairs(list) do

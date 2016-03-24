@@ -607,14 +607,44 @@ local function addpar( t )
 end
 
 local lake_env
+local project_root
 
-local function use_rules( rules_fn, rules_mode )
-  local basedir = repo.get_base_path()
-  local rules_path = basedir .. '/' .. rules_fn
-  lake_env.basedir = basedir
+--- Returns path to a project root directory.
+local function get_project_root()
+  local project_root = repo.search_marker_up('lake_marker') or repo.search_marker_up('lake_project')
+  if not project_root then
+    abort("Cannot find lake_marker or lake_project file in the project root directory.")
+  end
+  return project_root
+end
+
+--- Helper function for loading rules. Loads rules by a given path.
+local function load_rules_file( rules_path, params )
+  lake_env.basedir = get_project_root()
+  lake.rules_initialized = true
   prot_run(rules_path, lake_env)
   if type(lake_env.init_rules) == 'function' then
-    lake_env.init_rules(rules_mode or {})
+    lake_env.init_rules(params or {})
+  end
+end
+
+--- Loads rules from devenv directory.
+local function rules( rules, params )
+  local rules_path = os.getenv('LWDG_HOME') .. '/lutils/rules/' .. rules .. '.lru'
+  load_rules_file(rules_path, params)
+end
+
+--- Searches for rules in the project directory and then initializes them if found.
+local function use_rules( rules_fn, params )
+  local rules_path = get_project_root() .. '/' .. rules_fn
+  load_rules_file(rules_path, params)
+end
+
+--- Searches for file 'lake_project' and then executes it in a protected environment.
+local function use_lake_project()
+  local lake_project = get_project_root() .. '/lake_project'
+  if lfs.attributes(lake_project) ~= nil then
+    prot_run(lake_project, lake_env)
   end
 end
 
@@ -628,8 +658,8 @@ lake_env = {
   cc = cc_tbl,
 
   abort = abort, run = run, subst = subst, split = fname.split,
-  addpar = addpar, use_rules = use_rules, exe_name = exe_name,
-  dl_name = dl_name
+  addpar = addpar, rules = rules, use_rules = use_rules,
+  exe_name = exe_name, dl_name = dl_name
 }
 
 -- main
@@ -642,6 +672,13 @@ local function main( action, lakefilename, options )
 
   local cwd = lfs.currentdir()
   prot_run(lakefilename, lake_env)
+  
+  -- There must be either use_rules() call in a lakefile or in a lake_project file in the root
+  -- folder of a project. 
+  if not lake_env.lake.rules_initialized then
+    use_lake_project()
+  end
+  
   lakefile = lake_env.lake
   lakefile.basedir = norm_dir(get_param('basedir'))
   start_cwd = calc_cwd(norm_dir(cwd))
@@ -668,7 +705,7 @@ local options = cmdl.options()
 
 if options['-h'] ~= nil then
   io.write(copyright .. '\n')
-  io.write'Usage: lua llake.lua [action] [lakefile] [-v] [-d] [-s]\n'
+  io.write'Usage: lua llake.lua [action] [lakefile] [-v] [-d] [-s] [-h]\n'
   io.write'Actions: pdep, make, build, export\n'
   io.write'Options:\n'
   io.write'  -v  Verbose mode\n'

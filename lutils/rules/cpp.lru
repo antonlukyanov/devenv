@@ -1,0 +1,341 @@
+require 'libplatform'
+
+local os_type = platform.os_type
+
+function add_suff( var, suff, delim )
+  if not delim then delim = ' ' end
+  if var ~= "" and var:sub(-1,-1) ~= delim then var = var .. delim end
+  return var .. suff
+end
+
+function init_rules( params )
+  local obj_pref = ''
+  local cc_opt = ''
+  local ld_opt = ''
+  local libs_opt = ''
+
+  local function pref( s ) obj_pref = add_suff(obj_pref, s, '_') end
+  local function cc( s ) cc_opt = add_suff(cc_opt, s) end
+  local function ld( s ) ld_opt = add_suff(ld_opt, s) end
+  local function libs( s ) libs_opt = add_suff(libs_opt, s) end
+
+  if type(lake.options) == 'table' then
+    for k, v in pairs(lake.options) do
+      params[k] = v
+    end
+  end
+
+  -- Выводим все полученные опции.
+  
+  if os_type == 'windows' then
+    io.write('mode: mingw g++')
+  elseif os_type == 'osx' or os_type == 'linux' then
+    io.write('mode: GNU g++')
+  end
+  
+  for mn, mv in pairs(params) do
+    if mv then
+      if type(mv) == 'boolean' then
+        io.write(', ', mn)
+      else
+        io.write(', ', mn .. '('..tostring(mv)..')')
+      end
+    end
+  end
+  io.write('\n')
+
+  local home_path = os.getenv('LWDG_HOME')
+
+  if params.debug then
+    pref('debug')
+    if os_type == 'windows' then
+      cc('-gstabs+')
+    elseif os_type == 'linux' then
+      cc('-g')
+    elseif os_type == 'osx' then
+      cc('-gdwarf-4')
+    end
+  end
+  
+  if params.fastmath then
+    pref('fastmath')
+    cc('-ffast-math')
+  end
+    
+  if params.prof then
+    pref('prof')
+    ld('-pg')
+  end
+
+  if params.cpp11 then
+    cc('-std=c++11')
+  end
+  
+  if params.gui and os_type == 'windows' then
+    ld('-mwindows')
+  end
+  
+  if params.dll then
+    if os_type == 'windows' then
+      ld('-shared')
+    elseif os_type == 'osx' then
+      ld('-dynamiclib -flat_namespace')
+    elseif os_type == 'linux' then
+      cc('-fpic')
+      ld('-shared')
+    end
+  end
+
+  cc('-Wall -pthread')
+  cc('-I ${std_inc}')
+  cc((params.debug and '-O0') or '-O2')
+  ld('-pthread')
+  
+  -- Под OSX будет ошибка "ld: library not found for -lcrt0.o".
+  if os_type == 'windows' then
+    -- Одновременная сборка модулей с опцией -static и без нее приводит к падению,
+    -- поэтому опция -static теперь всегда включена,
+    -- а опция 'static = true' в llk-файлах считается устаревшей.  
+    ld('-static')
+  end
+  
+  ld('-L${std_lib}')
+  
+  libs('-llua52')
+  
+  if os_type == 'linux' then
+    libs('-ldl')
+  end
+  
+  if params.libs then
+    for ln in params.libs:gmatch('%S+') do
+      libs('-l' .. ln)
+    end
+  end
+
+  local std_inc = home_path .. '/include'
+  local std_inc_ex = '$(LWDG_HOME)/include'
+  local std_lib = home_path .. '/lib'
+
+  -- export
+
+  mk_cc = function( dst_fn, src_fn, inc_opt )
+    local par = {
+      inc_opt = inc_opt, dst_fn = dst_fn, src_fn = src_fn, cc_opt = cc_opt,
+      std_inc = std_inc,
+    }
+    return subst('g++ ${cc_opt} ${inc_opt} -o${dst_fn} -c ${src_fn}', par)
+  end
+  
+  mk_cc_ex = function( dst_fn, src_fn )
+    local par = {
+      dst_fn = dst_fn, src_fn = src_fn, cc_opt = cc_opt,
+      std_inc = std_inc_ex,
+    }
+    return subst('g++ ${cc_opt} -o${dst_fn} -c ${src_fn}', par)
+  end
+  
+  mk_ld = function( dst_fn, obj_lst, is_export )
+    local dst_bn = split(dst_fn).name
+    local par = {
+      dst_bn = dst_bn, dst_fn = dst_fn, obj_lst = obj_lst, libs_opt = libs_opt, ld_opt = ld_opt,
+      std_lib = std_lib,
+    }
+    if is_export then
+      par.std_lib = '$(LWDG_HOME)/lib'
+    end
+    return subst('g++ ${ld_opt} -o${dst_fn} ${obj_lst} ${libs_opt}', par)
+  end
+  
+  mk_a = function( dst_fn, obj_lst )
+    local par = {
+      dst_fn = dst_fn, obj_lst = obj_lst,
+    }
+    return subst('ar rcs ${dst_fn} ${obj_lst}', par)
+  end
+  
+  mk_rc = function( dst_fn, src_fn, is_export )
+    local rc_opt = ''
+    local loc_rc_inc = rc_inc
+    if loc_rc_inc then
+      loc_rc_inc = '--include-dir ' .. loc_rc_inc
+    else
+      loc_rc_inc = ''
+    end
+    local par = { dst_fn = dst_fn, src_fn = src_fn, rc_opt = rc_opt, rc_inc = loc_rc_inc }
+    local cmd_rc = 'windres -i${src_fn} -o${dst_fn} ${rc_opt} ${rc_inc}'
+    return subst(cmd_rc, par)
+  end
+  
+  mk_obj_id = function( dir, name )
+    local id = ''
+    
+    if obj_pref ~= '' then
+      id = obj_pref .. '-'
+    end
+    
+    id = id .. string.gsub(dir .. name, '[%/%\\]', '__')
+
+    return id
+  end
+end
+
+addpar{
+  basedir = basedir,
+  rev_slash = false,
+  case_sens = os_type ~= 'windows',
+  usefile_name = 'llake_use',
+  use_cwd = true,
+
+  lib2fname = function( name )
+    return name .. '.a'
+  end,
+
+  res2fname = function( name )
+    return name .. '.rc'
+  end,
+
+  export_preambule = {
+    "# define variable properly",
+    "#LWDG_HOME=path",
+    "",
+  },
+
+  ['.cc'] = {
+    dep_parser = cc.hdr_parser,
+    is_nontransitive_dep = false,
+    task_parser = cc.lib_parser,
+
+    src2obj = function( basedir, dir, name )
+      return basedir .. 'obj/' .. mk_obj_id(dir, name) .. '.o'
+    end,
+
+    export_src2obj = function( name )
+      return name .. '.o'
+    end,
+
+    compile = function( dst_fn, name, dir, paths )
+      local inc_opt = ""
+      for _, p in ipairs(paths) do
+        inc_opt = inc_opt .. '-iquote ' .. p:sub(1,-2) .. ' '
+      end
+      inc_opt = inc_opt:sub(1, -2)
+      local src_fn = dir..name..'.cc'
+      return mk_cc(dst_fn, src_fn, inc_opt), 'CC ' .. name .. '.cc'
+    end,
+
+    export_compile = function( dst_fn, name )
+      local src_fn = name..'.cc'
+      return mk_cc_ex(dst_fn, src_fn)
+    end,
+  },
+
+  ['.h'] = {
+    dep_parser = cc.hdr_parser,
+    is_nontransitive = false,
+    dep2src = function(fn) return split(fn).name .. '.cc' end,
+    do_demand_src = false,
+    task_parser = cc.lib_parser,
+  },
+
+  ['.eh'] = {
+    dep_parser = cc.hdr_parser,
+    is_nontransitive = false,
+  },
+
+  ['.hg'] = {
+  },
+
+  ['.xpm'] = {
+  },
+
+  ['.a'] = {
+    src2obj = function( basedir, dir, name )
+      return basedir .. dir .. name .. '.a'
+    end,
+
+    export_src2obj = function( name )
+      return name .. '.a'
+    end,
+
+    weight = 100,
+  },
+
+  ['.rc'] = {
+    src2obj = function( basedir, dir, name )
+      return basedir .. 'obj/' .. mk_obj_id(dir, name) .. '.o'
+    end,
+
+    export_src2obj = function( name )
+      return name .. '.o'
+    end,
+
+    compile = function( dst_fn, name, dir, paths )
+      local src_fn = dir..name..'.rc'
+      return mk_rc(dst_fn, src_fn), 'RC ' .. name .. '.rc'
+    end,
+
+    export_compile = function( dst_fn, name )
+      local src_fn = name..'.rc'
+      return mk_rc(dst_fn, src_fn, true)
+    end,
+  },
+
+  link = function( dst_fn, obj_list )
+    local obj_lst = ""
+    for _, obj in ipairs(obj_list) do
+      obj_lst = obj_lst .. obj .. ' '
+    end
+    obj_lst = obj_lst:sub(1, -2)
+    
+    if split(dst_fn).ext == '.a' then
+      return mk_a(dst_fn, obj_lst), 'AR ' .. dst_fn
+    else
+      return mk_ld(dst_fn, obj_lst), 'LD ' .. dst_fn
+    end
+  end,
+
+  export_link = function( dst_fn, obj_list )
+    local obj_lst = ""
+    for _, obj in ipairs(obj_list) do
+      obj_lst = obj_lst .. obj .. ' '
+    end
+    obj_lst = obj_lst:sub(1, -2)
+    return mk_ld(dst_fn, obj_lst, true)
+  end,
+
+  strip = function( dst_fn )
+    local cmdl = "strip " .. dst_fn
+    return cmdl, 'STRIP ' .. dst_fn
+  end,
+
+  prepare = function( base_dir, proj_dir )
+    pipeline = function( cmd )
+      local pipe, err = io.popen(cmd, 'r')
+      if pipe == nil then
+        io.stderr:write('error: ', err, '\n')
+        return nil
+      else
+        local s = pipe:read('*line')
+        pipe:close()
+        return s
+      end
+    end
+    
+    local ver = 'none'
+    local date = pipeline('hg parents --template "{date|shortdate}"')
+    local id = pipeline('hg identify -i')
+    if not date or not id then
+      io.stderr:write('error: cannot get revision info\n')
+    else
+      local y, m, d = date:match('^"?%d%d(%d%d)%-(%d%d)%-(%d%d)"?$')
+      local h, mod =  id:match('^(%x+)(%+?)$')
+      ver = y..m..d..'-'..h:sub(1,6)..(mod=='+' and 'M' or '')
+    end
+
+    local file = io.open('revision.hg', 'w')
+    file:write('// This is automatically generated file -- do not edit!\n\n')
+    file:write('#define HG_VER "', ver,'"\n')
+    file:close()
+  end,
+}

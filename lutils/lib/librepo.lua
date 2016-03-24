@@ -13,19 +13,19 @@ local function search_marker_up( marker_name )
     end
     prev_dir = dir
   end
-  local res = lfs.currentdir()
+  
+  local res = false
+  if lfs.attributes(marker_name) then
+    res = lfs.currentdir()
+  end
+  
   lfs.chdir(cwd)
+  
   return res
 end
 
-local repo_marker = 'lake_marker'
-
-local function get_base_path()
-  return search_marker_up(repo_marker)
-end
-
 repo = {
-  get_base_path = get_base_path,
+  search_marker_up = search_marker_up,
 }
 
 return repo
