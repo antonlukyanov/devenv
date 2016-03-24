@@ -301,7 +301,12 @@ addpar{
       obj_lst = obj_lst .. obj .. ' '
     end
     obj_lst = obj_lst:sub(1, -2)
-    return mk_ld(dst_fn, obj_lst, true)
+    
+    if split(dst_fn).ext == '.a' then
+      return mk_a(dst_fn, obj_lst)
+    else
+      return mk_ld(dst_fn, obj_lst, true)
+    end
   end,
 
   strip = function( dst_fn )
