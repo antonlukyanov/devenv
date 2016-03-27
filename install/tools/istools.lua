@@ -5,9 +5,34 @@ dofile '../lutils/lib/libplatform.lua'
 success_code = platform.get_success_code()
 os_type = platform.get_os_type()
 
+function try_require(module)
+  local status, result = pcall(require, module)
+  return result
+end
+
 --
 -- Файловая система
 --
+
+local lfs = try_require 'lfs'
+
+if not lfs then
+  function cwd()
+    return istools.cwd()
+  end
+  
+  function chdir( path )
+    return istools.chdir(path)
+  end
+else
+  function cwd()
+    return lfs.currentdir()
+  end
+  
+  function chdir( path )
+    return lfs.chdir(path)
+  end
+end
 
 --- Проверка файла на существование в файловой системе.
 function is_file( nm )
@@ -17,14 +42,6 @@ function is_file( nm )
     file:close()
   end
   return res
-end
-
-function cwd()
-  return istools.cwd()
-end
-
-function chdir( path )
-  return istools.chdir(path)
 end
 
 function mkfile( filepath )

@@ -226,11 +226,12 @@ if tasks['setenv'] then
     end
   end
 end
-
+ 
 --
 -- Проверяем наличие программ и их версии
 --
 if tasks['testprg'] then
+
   msg "Testing standard programs..."
   
   local progs = {}
@@ -365,26 +366,12 @@ end
 -- Сборка внешних утилит
 --
 
-if tasks['extutl'] then
-  msg "Building external utilities..."
-  
-  -- Собираем libjpeg.
-  msg "  Building libjpeg..."
-  lua_make('third-party/libjpeg')
-
-  -- Собираем libzlib.
-  msg "  Building libzlib..."
-  lua_make('third-party/zlib')
-
-  -- Собираем libtiff.
-  msg "  Building libtiff..."
-  lua_make('third-party/libtiff')
-
-  local lua_path = 'third-party/lua-addons/setup'
-  
+if tasks['lua'] then
   -- Собираем lua.
   msg "  Building lua interpreter..."
-  
+
+  local lua_path = 'third-party/lua-addons/setup'
+
   if os_type == 'windows' then
     execf('cp', 'temp/standalone-lua.exe ../%s', lua_path)
     lua_make(lua_path, 'build_lua.lua')
@@ -404,6 +391,22 @@ if tasks['extutl'] then
   -- Собираем сторонние lua-модули.
   msg "  Building lua module lfs"
   lua_make(lua_path, 'build_lfs.lua')
+end
+
+if tasks['extutl'] then
+  msg "Building external utilities..."
+  
+  -- Собираем libjpeg.
+  msg "  Building libjpeg..."
+  lua_make('third-party/libjpeg')
+
+  -- Собираем libzlib.
+  msg "  Building libzlib..."
+  lua_make('third-party/zlib')
+
+  -- Собираем libtiff.
+  msg "  Building libtiff..."
+  lua_make('third-party/libtiff')
   
   if os_type == 'windows' then
     -- @Todo: с Lua 5.2 не собирается. Ругается на luaL_putchar().
