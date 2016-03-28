@@ -396,15 +396,12 @@ end
 if tasks['extutl'] then
   msg "Building external utilities..."
   
-  -- Собираем libjpeg.
   msg "  Building libjpeg..."
   lua_make('third-party/libjpeg')
 
-  -- Собираем libzlib.
   msg "  Building libzlib..."
   lua_make('third-party/zlib')
 
-  -- Собираем libtiff.
   msg "  Building libtiff..."
   lua_make('third-party/libtiff')
   
