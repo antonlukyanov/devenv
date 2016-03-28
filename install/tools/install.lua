@@ -377,9 +377,7 @@ if tasks['lua'] then
     lua_make(lua_path, 'build_lua.lua')
     rmfile('../' .. lua_path .. '/' .. 'standalone-lua.exe')
   else
-    execf('cp', 'temp/standalone-lua ../%s', lua_path)
     lua_make(lua_path, 'build_lua.lua')
-    rmfile('../' .. lua_path .. '/' .. 'standalone-lua')
 
     -- В OSX 10.11 (El Capitan) теперь DYLD_LIBRARY_PATH не экспортируется в дочерние процессы,
     -- приходится делать ссылку в папке usr/local/lib.

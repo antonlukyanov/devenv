@@ -1,4 +1,4 @@
-use_rules('lwml/cpp.lru', { dll = true, static = true } )
+rules('cpp', { dll = true } )
 
 addpar{
   use = { 'lwml' },

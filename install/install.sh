@@ -43,8 +43,8 @@ case $uname in
       $luai $install_lwdg setenv
       source ~/.devenv
       args=(testprg createtree lutils extutl localutl)
-      if [[ $build_standalone_lua == true ]]; then
-        $args=(testprg createtree lutils lua extutl localutl)
+      if [[ $is_standalone_lua == true ]]; then
+        args=(testprg createtree lutils lua extutl localutl)
       fi
       $luai $install_lwdg $args
     fi
