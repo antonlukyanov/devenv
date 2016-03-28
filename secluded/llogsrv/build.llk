@@ -1,6 +1,6 @@
 local p = require 'libplatform'
 
-use_rules('lwml/cpp.lru', { dll = true } )
+rules('cpp', { dll = true })
 
 addpar{
   use = { },
