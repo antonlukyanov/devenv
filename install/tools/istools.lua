@@ -318,7 +318,7 @@ function llake_make( path, name, dst )
   if os_type == 'windows' then
     arguments = '-s make build.llk 2>nul 1>nul'
   else
-    arguments = 'make build.llk &>/dev/null'
+    arguments = 'make build.llk 1>/dev/null 2>/dev/null'
   end
   
   cdrun(path, 'llake', arguments)
