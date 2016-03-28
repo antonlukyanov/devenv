@@ -42,11 +42,10 @@ case $uname in
     else
       $luai $install_lwdg setenv
       source ~/.devenv
-      args=(testprg createtree lutils extutl localutl)
       if [[ $is_standalone_lua == true ]]; then
-        args=(testprg createtree lutils lua extutl localutl)
+        $luai $install_lwdg testprg createtree lutils lua extutl localutl
       fi
-      $luai $install_lwdg $args
+      $luai $install_lwdg testprg createtree lutils extutl localutl
     fi
     ;;
 esac
