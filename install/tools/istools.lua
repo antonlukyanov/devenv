@@ -7,6 +7,9 @@ os_type = platform.get_os_type()
 
 function try_require(module)
   local status, result = pcall(require, module)
+  if not status then
+    result = false
+  end
   return result
 end
 
