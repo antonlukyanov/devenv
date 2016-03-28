@@ -105,6 +105,8 @@ function init_rules( params )
     libs('-llua5.2')
     libs('-ldl')
   elseif os_type == 'osx' then
+    ld('-L/usr/local/lib')
+    cc('-I/usr/local/include/lua5.2')
     libs('-llua.5.2')
   else
     libs('-llua52')
