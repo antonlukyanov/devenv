@@ -334,13 +334,14 @@ addpar{
     end
     
     local ver = 'none'
-    local date = pipeline('hg parents --template "{date|shortdate}"')
+    -- Empty space in necessary for non-committed merge, when two dates are printed instead of one. 
+    local date = pipeline('hg parents --template "{date|shortdate} "')
     local id = pipeline('hg identify -i')
     if not date or not id then
       io.stderr:write('error: cannot get revision info\n')
     else
-      local y, m, d = date:match('^"?%d%d(%d%d)%-(%d%d)%-(%d%d)"?$')
-      local h, mod =  id:match('^(%x+)(%+?)$')
+      local y, m, d = date:match('^"?%d%d(%d%d)%-(%d%d)%-(%d%d)"?')
+      local h, mod =  id:match('^(%x+)(%+?)')
       ver = y..m..d..'-'..h:sub(1,6)..(mod=='+' and 'M' or '')
     end
 
