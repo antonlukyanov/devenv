@@ -1,6 +1,5 @@
-use_rules('lwml/cpp.lru', { dll = true, static = true } )
-
 addpar{
+  options = { dll = true, static = true },
   use = { 'lwml' },
   start = 'limcov.cc',
   dest = 'limcov.dll',

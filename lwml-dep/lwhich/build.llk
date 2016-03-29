@@ -1,6 +1,5 @@
-use_rules('lwml/cpp.lru', { static = true })
-
 addpar{
+  options = { static = true },
   use = { 'lwml' },
   start = 'lwhich.cc',
   dest = 'lwhich.exe',

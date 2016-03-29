@@ -1,6 +1,5 @@
-use_rules('lwml/mingw.lru', { dll = true, static = true } )
-
 addpar{
+  options = { dll = true, static = true },
   use = { 'lwml' },
   start = 'lswp.cc',
   dest = 'lswp.dll',

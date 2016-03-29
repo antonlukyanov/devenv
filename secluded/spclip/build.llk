@@ -1,6 +1,5 @@
-use_rules('lwml/cpp.lru', { gui = true, static = true })
-
 addpar{
+  options = { gui = true, static = true },
   use = {},
   start = 'spclip.cc',
   dest = 'spclip.exe',

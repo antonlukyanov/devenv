@@ -1,6 +1,5 @@
-use_rules('lwml/cpp.lru', { dll = true, static = true, libs = "tiff jpeg zlib" } )
-
 addpar{
+  options = { dll = true, static = true, libs = "tiff jpeg zlib" },
   use = {},
   start = 'limlibdll.cc',
   dest = 'limlib.dll',

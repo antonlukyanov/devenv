@@ -1,8 +1,5 @@
-local p = require 'libplatform'
-
-rules('cpp', { dll = true })
-
 addpar{
+  options = { dll = true },
   use = { },
   start = 'llogsrvdll.cc',
   dest = dl_name('llogsrv'),

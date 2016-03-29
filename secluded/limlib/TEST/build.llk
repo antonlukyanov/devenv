@@ -1,5 +1,3 @@
-use_rules('lwml/mingw.lru')
-
 addpar{
   use = { 'secluded/limlib' },
   start = 'test.cc',

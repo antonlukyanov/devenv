@@ -1,6 +1,5 @@
-use_rules('lwml/cpp.lru', { dll = true, gui = true, static = true, libs = "ddraw" } )
-
 addpar{
+  options = { dll = true, gui = true, static = true, libs = "ddraw" },
   use = { 'lwml' },
   start = 'lswg.cc',
   dest = 'lswg.dll',

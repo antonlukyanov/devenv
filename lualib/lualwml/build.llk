@@ -1,6 +1,5 @@
-rules('cpp', { dll = true } )
-
 addpar{
+  options = { dll = true },
   use = { 'lwml' },
   start = 'lualwml.cc',
   dest = dl_name('lualwml'),
