@@ -99,6 +99,18 @@ function init_rules( params )
     ld('-static')
   end
   
+  if params.libdirs then
+    for _, dir in ipairs(params.libdirs) do
+      ld('-L' .. dir)
+    end
+  end
+  
+  if params.incdirs then
+    for _, dir in ipairs(params.incdirs) do
+      cc('-I' .. dir)
+    end
+  end
+  
   ld('-L${std_lib}')
     
   if os_type == 'linux' then
