@@ -50,10 +50,8 @@ function init_rules( params )
     pref('debug')
     if os_type == 'windows' then
       cc('-gstabs+')
-    elseif os_type == 'linux' then
+    else
       cc('-g')
-    elseif os_type == 'osx' then
-      cc('-gdwarf-4')
     end
   end
   
