@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 
 --[[
-  lake, (c) ltwood
+  lake, 2003 Aug, 2012 Mar (c) ltwood
 --]]
 
 require "lfs"
@@ -10,7 +10,8 @@ require "libfname"
 require "librepo"
 require "libplatform"
 
-local copyright = 'lake: ver. 8.04, 2003 Aug, 2012 Mar, (c) ltwood'
+local version = 'lake: ver. 0.1'
+
 -- 7.02: r.3130
 -- 7.03: r.3131
 -- 7.04: r.3139
@@ -25,6 +26,10 @@ local copyright = 'lake: ver. 8.04, 2003 Aug, 2012 Mar, (c) ltwood'
 -- 8.02: схема поиска базовой директории
 -- 8.03: вывод путей для файлов-дубликатов
 -- 8.04: добавлена опция '-c'
+--
+-- 26.03.2016 смена нумерации версий: теперь major.minor.bugfix.
+--
+-- 0.1: первый релиз с поддержкой Linux и OS X.
 
 local devel = false
 local success_code = platform.get_success_code()
@@ -710,7 +715,7 @@ end
 local options = cmdl.options()
 
 if options['-h'] ~= nil then
-  io.write(copyright .. '\n')
+  io.write(version .. '\n')
   io.write'Usage: lua llake.lua [action] [lakefile] [-v] [-d] [-s] [-h]\n'
   io.write'Actions: pdep, make, rebuild, export\n'
   io.write'  pdep     Print dependencies for each file using specified lakefile.\n'
