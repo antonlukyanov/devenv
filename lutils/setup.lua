@@ -32,6 +32,10 @@ local list = {
  { 'lutils/lib', 'lib/libsert.lua' },
  { 'lutils/lib', 'lib/libsavet.lua' },
  { 'lutils/lib', 'lib/liblxml.lua' },
+ { 'lutils/lib', 'lib/str.lua' },
+ { 'lutils/lib', 'lib/class.lua' },
+ { 'lutils/lib', 'lib/fun.lua' },
+ { 'lutils/lib', 'lib/argparser.lua' },
  { 'lutils/lib', '../third-party/json/json.lua' },
 
  { 'lutils', 'luaht/luaht.lua' },
