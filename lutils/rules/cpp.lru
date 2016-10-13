@@ -2,6 +2,15 @@ require 'libplatform'
 
 local os_type = platform.os_type
 
+-- Выбор компилятора и прочие опции необходимо вынести в отдельный файл, чтобы было
+-- для каждого проекта отдельно.
+local CXX
+if os_type == 'osx' then
+  CXX = 'clang++'
+else
+  CXX = 'g++'
+end
+
 function add_suff( var, suff, delim )
   if not delim then delim = ' ' end
   if var ~= "" and var:sub(-1,-1) ~= delim then var = var .. delim end
@@ -26,13 +35,13 @@ function init_rules( params )
   end
 
   -- Выводим все полученные опции.
-  
+
   if os_type == 'windows' then
     io.write('mode: mingw g++')
   elseif os_type == 'osx' or os_type == 'linux' then
     io.write('mode: GNU g++')
   end
-  
+
   for mn, mv in pairs(params) do
     if mv then
       if type(mv) == 'boolean' then
@@ -54,12 +63,12 @@ function init_rules( params )
       cc('-g')
     end
   end
-  
+
   if params.fastmath then
     pref('fastmath')
     cc('-ffast-math')
   end
-    
+
   if params.prof then
     pref('prof')
     ld('-pg')
@@ -68,11 +77,11 @@ function init_rules( params )
   if params.cpp11 then
     cc('-std=c++11')
   end
-  
+
   if params.gui and os_type == 'windows' then
     ld('-mwindows')
   end
-  
+
   if params.dll then
     if os_type == 'windows' then
       ld('-shared')
@@ -84,33 +93,38 @@ function init_rules( params )
     end
   end
 
-  cc('-Wall -pthread')
+  cc('-Wall')
+  if os_type ~= 'osx' then
+    cc('-pthread')
+    ld('-pthread')
+  else
+    cc('-Wno-missing-declarations')
+  end
   cc('-I ${std_inc}')
   cc((params.debug and '-O0') or '-O2')
-  ld('-pthread')
-  
+
   -- Под OSX будет ошибка "ld: library not found for -lcrt0.o".
   if os_type == 'windows' then
     -- Одновременная сборка модулей с опцией -static и без нее приводит к падению,
     -- поэтому опция -static теперь всегда включена,
-    -- а опция 'static = true' в llk-файлах считается устаревшей.  
+    -- а опция 'static = true' в llk-файлах считается устаревшей.
     ld('-static')
   end
-  
+
   if params.libdirs then
     for _, dir in ipairs(params.libdirs) do
       ld('-L' .. dir)
     end
   end
-  
+
   if params.incdirs then
     for _, dir in ipairs(params.incdirs) do
       cc('-I' .. dir)
     end
   end
-  
+
   ld('-L${std_lib}')
-    
+
   if os_type == 'linux' then
     libs('-llua5.2')
     libs('-ldl')
@@ -122,7 +136,7 @@ function init_rules( params )
   else
     libs('-llua52')
   end
-  
+
   if params.libs then
     for ln in params.libs:gmatch('%S+') do
       libs('-l' .. ln)
@@ -137,39 +151,42 @@ function init_rules( params )
 
   mk_cc = function( dst_fn, src_fn, inc_opt )
     local par = {
+      CXX = CXX,
       inc_opt = inc_opt, dst_fn = dst_fn, src_fn = src_fn, cc_opt = cc_opt,
       std_inc = std_inc,
     }
-    return subst('g++ ${cc_opt} ${inc_opt} -o${dst_fn} -c ${src_fn}', par)
+    return subst('${CXX} ${cc_opt} ${inc_opt} -o${dst_fn} -c ${src_fn}', par)
   end
-  
+
   mk_cc_ex = function( dst_fn, src_fn )
     local par = {
+      CXX = CXX,
       dst_fn = dst_fn, src_fn = src_fn, cc_opt = cc_opt,
       std_inc = std_inc_ex,
     }
-    return subst('g++ ${cc_opt} -o${dst_fn} -c ${src_fn}', par)
+    return subst('${CXX} ${cc_opt} -o${dst_fn} -c ${src_fn}', par)
   end
-  
+
   mk_ld = function( dst_fn, obj_lst, is_export )
     local dst_bn = split(dst_fn).name
     local par = {
+      CXX = CXX,
       dst_bn = dst_bn, dst_fn = dst_fn, obj_lst = obj_lst, libs_opt = libs_opt, ld_opt = ld_opt,
       std_lib = std_lib,
     }
     if is_export then
       par.std_lib = '$(LWDG_HOME)/lib'
     end
-    return subst('g++ ${ld_opt} -o${dst_fn} ${obj_lst} ${libs_opt}', par)
+    return subst('${CXX} ${ld_opt} -o${dst_fn} ${obj_lst} ${libs_opt}', par)
   end
-  
+
   mk_a = function( dst_fn, obj_lst )
     local par = {
       dst_fn = dst_fn, obj_lst = obj_lst,
     }
     return subst('ar rcs ${dst_fn} ${obj_lst}', par)
   end
-  
+
   mk_rc = function( dst_fn, src_fn, is_export )
     local rc_opt = ''
     local loc_rc_inc = rc_inc
@@ -182,14 +199,14 @@ function init_rules( params )
     local cmd_rc = 'windres -i${src_fn} -o${dst_fn} ${rc_opt} ${rc_inc}'
     return subst(cmd_rc, par)
   end
-  
+
   mk_obj_id = function( dir, name )
     local id = ''
-    
+
     if obj_pref ~= '' then
       id = obj_pref .. '-'
     end
-    
+
     id = id .. string.gsub(dir .. name, '[%/%\\]', '__')
 
     return id
@@ -303,7 +320,7 @@ addpar{
       obj_lst = obj_lst .. obj .. ' '
     end
     obj_lst = obj_lst:sub(1, -2)
-    
+
     if split(dst_fn).ext == '.a' then
       return mk_a(dst_fn, obj_lst), 'AR ' .. dst_fn
     else
@@ -317,7 +334,7 @@ addpar{
       obj_lst = obj_lst .. obj .. ' '
     end
     obj_lst = obj_lst:sub(1, -2)
-    
+
     if split(dst_fn).ext == '.a' then
       return mk_a(dst_fn, obj_lst)
     else
@@ -342,9 +359,9 @@ addpar{
         return s
       end
     end
-    
+
     local ver = 'none'
-    -- Empty space in necessary for non-committed merge, when two dates are printed instead of one. 
+    -- Empty space in necessary for non-committed merge, when two dates are printed instead of one.
     local date = pipeline('hg parents --template "{date|shortdate} "')
     local id = pipeline('hg identify -i')
     if not date or not id then

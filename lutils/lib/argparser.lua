@@ -91,9 +91,10 @@ print(p:option('d'))
 print(p:option('flag1'))
 print(p:option('flag2'))
 ]]
+
 local ArgParser = class()
 
-function ArgParser:__constructor(name, description)
+function ArgParser:__constructor(options)
   self:extend({
     args = {},
     args_required = {},
@@ -101,10 +102,14 @@ function ArgParser:__constructor(name, description)
     options = {},
     options_list = {},
     parsed = false,
-    name = name,
-    description = description,
+    name = nil,
+    description = nil,
     last_value = nil,
-  })
+  }, options)
+end
+
+function ArgParser:set_description(s)
+  self.description = s
 end
 
 function ArgParser:get_option_names(s)
@@ -359,9 +364,9 @@ function ArgParser:get_help()
   end
   
   local function wrap_help(s)
-    local help_lines = str.split(str.wrap(s, 80), '\n')
+    local help_lines = str.split(s, '\n')
     for i, v in ipairs(help_lines) do
-      help_lines[i] = '    ' .. v
+      help_lines[i] = '      ' .. v
     end
     return str.join('\n', help_lines)
   end
@@ -391,7 +396,11 @@ function ArgParser:get_help()
   end
 
   if #self.args_names then
-    h('\n\n')
+    h('\n')
+    if not self.description then
+      h('\n')
+    end
+    
     h('Positional arguments:\n')
     for i, a_name in ipairs(self.args_names) do
       local arg_info = self.args[a_name]
@@ -407,9 +416,7 @@ function ArgParser:get_help()
   end
 
   if #self.options then
-    if #self.args_names then
-      h('\n')
-    else
+    if not #self.args_names then
       h('\n\n')
     end
     h('Options:\n')
@@ -424,10 +431,12 @@ function ArgParser:get_help()
         name = name .. '--' .. o.long
       end
       h('  ' .. name)
-      if o.long then
-        h(' <' .. string.upper(o.long) .. '>')
-      else
-        h(' <' .. string.upper(o.short) .. '>')
+      if o.type == 'option' then
+        if o.long then
+          h(' <' .. string.upper(o.long) .. '>')
+        else
+          h(' <' .. string.upper(o.short) .. '>')
+        end
       end
       h('\n')
       if o.help then
@@ -440,5 +449,11 @@ function ArgParser:get_help()
     end
   end
 
-  return help .. '\n'
+  return help
 end
+
+argparser = {
+  ArgParser = ArgParser
+}
+
+return argparser

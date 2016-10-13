@@ -4,11 +4,13 @@
   lake, 2003 Aug, 2012 Mar (c) ltwood
 --]]
 
-require "lfs"
-require "libcmdl"
-require "libfname"
-require "librepo"
-require "libplatform"
+require 'lfs'
+require 'libcmdl'
+require 'libfname'
+require 'librepo'
+require 'libplatform'
+
+ArgParser = require('argparser').ArgParser
 
 local version = 'lake: ver. 0.1'
 
@@ -30,6 +32,7 @@ local version = 'lake: ver. 0.1'
 -- 26.03.2016 смена нумерации версий: теперь major.minor.bugfix.
 --
 -- 0.1: первый релиз с поддержкой Linux и OS X.
+-- 0.2: внедрён ArgParser.
 
 local devel = false
 local success_code = platform.get_success_code()
@@ -69,10 +72,10 @@ local function prot_run( fname, env )
       env[k] = v
     end
   end
-  
+
   local func = assert(loadfile(fname, 'bt', env))
   func()
-  
+
   return env
 end
 
@@ -512,7 +515,7 @@ local function do_makefile( rep, dep, do_strip )
       mkf:write('\n')
     end
   end
-  
+
   dep.for_all(
     function(fi, dl)
       if not get_param(fi.ext).export_src2obj then
@@ -675,21 +678,21 @@ lake_env = {
 
 -- main
 
-local function main( action, lakefilename, options )
-  run_param.is_verb = (options['-v'] ~= nil)
-  run_param.is_dry = (options['-d'] ~= nil)
-  local do_link = (options['-c'] == nil)
-  local do_strip = (options['-s'] ~= nil)
+local function main( action, lakefilename, parser )
+  run_param.is_verb = parser:option('v')
+  run_param.is_dry = parser:option('d')
+  local do_link = not parser:option('c')
+  local do_strip = not parser:option('s')
 
   local cwd = lfs.currentdir()
   prot_run(lakefilename, lake_env)
-  
+
   -- There must be either use_rules() call in a lakefile or in a lake_project file in the root
-  -- folder of a project. 
+  -- folder of a project.
   if not lake_env.lake.rules_initialized then
     use_lake_project()
   end
-  
+
   lakefile = lake_env.lake
   lakefile.basedir = norm_dir(get_param('basedir'))
   start_cwd = calc_cwd(norm_dir(cwd))
@@ -702,8 +705,8 @@ local function main( action, lakefilename, options )
 
   if action == 'pdep' then
     dep.print()
-  elseif action == 'make' or action == 'rebuild' then
-    do_make(rep, dep, action == 'rebuild', do_link, do_strip)
+  elseif action == 'make' then
+    do_make(rep, dep, p:option('rebuild'), do_link, do_strip)
   elseif action == 'export' then
     do_export(rep, dep)
     do_makefile(rep, dep, do_strip)
@@ -712,38 +715,47 @@ local function main( action, lakefilename, options )
   end
 end
 
-local options = cmdl.options()
+p = ArgParser({description = [[
+Example usage:
+  >> llake
+  >> llake build.llk
+  >> llake build.llk rebuild --compile-only
+]]})
 
-if options['-h'] ~= nil then
-  io.write(version .. '\n')
-  io.write'Usage: lua llake.lua [action] [lakefile] [-v] [-d] [-s] [-h]\n'
-  io.write'Actions: pdep, make, rebuild, export\n'
-  io.write'  pdep     Print dependencies for each file using specified lakefile.\n'
-  io.write'  make     Build the target specified in a lakefile.\n'
-  io.write'  rebuild  Rebuild the target in specified lakefile.\n'
-  io.write'  export   Export to makefile.\n'
-  io.write'Options:\n'
-  io.write'  -v  Verbose mode.\n'
-  io.write'  -d  Dry run.\n'
-  io.write'  -c  Compile only.\n'
-  io.write'  -s  Strip executable.\n'
-  io.write'  -h  Display this help message.\n'
-  io.write'llake can be run without arguments, default arguments are "make build.llk".\n'
-  io.write'If there is only one argument, then it is treated as a lakefile.\n'
-  os.exit(1)
+p:add_arg('lakefile', 'build.llk')
+p:help('Lua file with build instructions.')
+
+p:add_arg('action', 'make')
+p:help([[
+Specify one of:
+    make      Build the target specified in a lakefile.
+    pdep      Print dependencies for each file using specified lakefile.
+    export    Export to makefile.
+Default action is make.
+]])
+
+p:add_flag('-h --help')
+p:help('Print this help message.')
+
+p:add_flag('-v --verbose')
+p:help('Verbose mode.')
+
+p:add_flag('-d --dry-run')
+p:help('Dry run.')
+
+p:add_flag('-c --compile-only')
+p:help('Compile only.')
+
+p:add_flag('-s --strip')
+p:help('Strip executable.')
+
+p:add_flag('-r --rebuild')
+p:help('Rebuild the target in specified lakefile.')
+
+p:parse()
+
+if p:option('help') then
+  print(p:get_help())
+else
+  main(p:arg('action'), p:arg('lakefile'), p)
 end
-
-local action = 'make'
-local lakefilename = 'build.llk'
-
-if #arg == 1 then
-  lakefilename = arg[1]
-elseif #arg == 2 then
-  action = arg[1]
-  lakefilename = arg[2]
-end
-
-main(action, lakefilename, options)
-
---[[
---]]
