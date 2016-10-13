@@ -452,8 +452,6 @@ function ArgParser:get_help()
   return help
 end
 
-argparser = {
+return {
   ArgParser = ArgParser
 }
-
-return argparser
