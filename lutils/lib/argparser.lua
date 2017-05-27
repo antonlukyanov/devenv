@@ -1,61 +1,33 @@
 -- argparser.lua, 2016, (c) Anton Lukyanov
 
-local fun   = require('fun')
-local str   = require('str')
-local class = require('class')
-
-local function abort(msg)
-  io.stderr:write('Error: ' .. msg .. '\n')
-  os.exit(1)
-end
-
-local function err(msg)
-  error('Error: ' .. msg .. '\n')
-end
-
-local function throw(info)
-  if type(info) == 'string' then
-    info = {
-      message = info
-    }
-  end
-  error(info)
-end
-
-local function try(fun, catch_fun)
-  local status, err = pcall(fun)
-  if not status then
-    catch_fun(err)
-  end
-end
-
 --[[
 ArgParser is a simple class for parsing command line options and arguments.
 
->> ArgParser:add_option(name, default)
-Adds option with name 'name'. 'name' must be in a format '-<shor name char> --<long name string>'.
-There must be at least short or long name. You can also optionally specify default value for option,
-otherwise its default value will be 'nil'.
+>> ArgParser:add_option(name, default, help)
+  Adds option with name 'name'. 'name' must be in a format '-<shor name char> --<long name string>'.
+  There must be at least short or long name. You can also optionally specify default value for
+  option, otherwise its default value will be 'nil'.
 
 >> ArgParser:add_flag(name)
-Adds option with name 'name'. 'name' must be in a format '-<shor name char> --<long name string>'.
-There must be at least short or long name. Difference between flag and option is that flag does not
-have a value. It can be either 'true' or 'false'.
+  Adds option with name 'name'. 'name' must be in a format '-<shor name char> --<long name string>'.
+  There must be at least short or long name. Difference between flag and option is that flag does
+  not have a value. It can be either 'true' or 'false'.
 
 >> ArgParser:add_arg(name, default, required)
-Adds positional argument with name 'name' and optional default value 'default'. It is also possible
-to specify whether argument is required or not by passing boolean value 'required'.
+  Adds positional argument with name 'name' and optional default value 'default'. It is also
+  possible to specify whether argument is required or not by passing boolean value 'required'.
 
 >> ArgParser:option(name)
-Returns value for option or flag.
+  Returns value for option or flag.
 
 >> ArgParser:arg(name)
-Returns value for positional argument specified by its name.
-
-[Other public methods]:
+  Returns value for positional argument specified by its name.
 
 >> ArgParser:parse(args)
-Parses table of arguments. 'args' is optional. You must call this method before using getters.
+  Parses table of arguments. 'args' is optional. You must call this method before using getters.
+
+>> ArgParser:get_help()
+  Returns help message.
 
 Example usage:
 
@@ -91,6 +63,35 @@ print(p:option('d'))
 print(p:option('flag1'))
 print(p:option('flag2'))
 ]]
+
+local fun   = require('fun')
+local str   = require('str')
+local class = require('class')
+
+local function abort(msg)
+  io.stderr:write('Error: ' .. msg .. '\n')
+  os.exit(1)
+end
+
+local function err(msg)
+  error('Error: ' .. msg .. '\n')
+end
+
+local function throw(info)
+  if type(info) == 'string' then
+    info = {
+      message = info
+    }
+  end
+  error(info)
+end
+
+local function try(fun, catch_fun)
+  local status, err = pcall(fun)
+  if not status then
+    catch_fun(err)
+  end
+end
 
 local ArgParser = class()
 
@@ -362,7 +363,7 @@ function ArgParser:get_help()
   local function h(s)
     help = help .. s
   end
-  
+
   local function wrap_help(s)
     local help_lines = str.split(s, '\n')
     for i, v in ipairs(help_lines) do
@@ -385,11 +386,11 @@ function ArgParser:get_help()
     end
     h(a_name)
   end
-  
+
   if #self.options then
     h('[options]')
   end
-  
+
   if self.description then
     h('\n\n')
     h(self.description)
@@ -400,7 +401,7 @@ function ArgParser:get_help()
     if not self.description then
       h('\n')
     end
-    
+
     h('Positional arguments:\n')
     for i, a_name in ipairs(self.args_names) do
       local arg_info = self.args[a_name]

@@ -343,7 +343,11 @@ addpar{
   end,
 
   strip = function( dst_fn )
-    local cmdl = "strip " .. dst_fn
+    local cmdl = "strip "
+    if os_type == 'osx' then
+      cmdl = cmdl .. "-x "
+    end
+    cmdl = cmdl .. dst_fn
     return cmdl, 'STRIP ' .. dst_fn
   end,
 
