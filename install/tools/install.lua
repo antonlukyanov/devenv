@@ -1,23 +1,23 @@
---- Данный скрипт выполняет установку рабочего окружения.
--- Этот скрипт не следует запускать вручную. В скрипте используются относительные пути
--- в предположении,  что скрипт был запущен из директории install репозитория devenv.
--- Возможные задачи, которые передаются в аргументах:
--- 
---   cleanenv   - выполняет очистку переменных окружения;
---   setenv     - выполняет установку переменных окружения;
---   testprg    - проверяет наличие программ и их версии;
---   createtree - создает отсутствующие поддиректории домашнего каталога;
---   reglua     - регистрирует расширение .lua в Windows;
---   lutils     - копирует утилиты lua;
---   extutl     - собирает внешние зависимости и утилиты;
---   localutl   - собирает различные локальные утилиты как независимые так и зависимые от lwml.
---   
--- Перед запуском скрипта необходимо убедиться, что установлен как минимум модуль luafilesystem.
+--- Р”Р°РЅРЅС‹Р№ СЃРєСЂРёРїС‚ РІС‹РїРѕР»РЅСЏРµС‚ СѓСЃС‚Р°РЅРѕРІРєСѓ СЂР°Р±РѕС‡РµРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ.
+-- Р­С‚РѕС‚ СЃРєСЂРёРїС‚ РЅРµ СЃР»РµРґСѓРµС‚ Р·Р°РїСѓСЃРєР°С‚СЊ РІСЂСѓС‡РЅСѓСЋ. Р’ СЃРєСЂРёРїС‚Рµ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Рµ РїСѓС‚Рё
+-- РІ РїСЂРµРґРїРѕР»РѕР¶РµРЅРёРё,  С‡С‚Рѕ СЃРєСЂРёРїС‚ Р±С‹Р» Р·Р°РїСѓС‰РµРЅ РёР· РґРёСЂРµРєС‚РѕСЂРёРё install СЂРµРїРѕР·РёС‚РѕСЂРёСЏ devenv.
+-- Р’РѕР·РјРѕР¶РЅС‹Рµ Р·Р°РґР°С‡Рё, РєРѕС‚РѕСЂС‹Рµ РїРµСЂРµРґР°СЋС‚СЃСЏ РІ Р°СЂРіСѓРјРµРЅС‚Р°С…:
+--
+--   cleanenv   - РІС‹РїРѕР»РЅСЏРµС‚ РѕС‡РёСЃС‚РєСѓ РїРµСЂРµРјРµРЅРЅС‹С… РѕРєСЂСѓР¶РµРЅРёСЏ;
+--   setenv     - РІС‹РїРѕР»РЅСЏРµС‚ СѓСЃС‚Р°РЅРѕРІРєСѓ РїРµСЂРµРјРµРЅРЅС‹С… РѕРєСЂСѓР¶РµРЅРёСЏ;
+--   testprg    - РїСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ РїСЂРѕРіСЂР°РјРј Рё РёС… РІРµСЂСЃРёРё;
+--   createtree - СЃРѕР·РґР°РµС‚ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёРµ РїРѕРґРґРёСЂРµРєС‚РѕСЂРёРё РґРѕРјР°С€РЅРµРіРѕ РєР°С‚Р°Р»РѕРіР°;
+--   reglua     - СЂРµРіРёСЃС‚СЂРёСЂСѓРµС‚ СЂР°СЃС€РёСЂРµРЅРёРµ .lua РІ Windows;
+--   lutils     - РєРѕРїРёСЂСѓРµС‚ СѓС‚РёР»РёС‚С‹ lua;
+--   extutl     - СЃРѕР±РёСЂР°РµС‚ РІРЅРµС€РЅРёРµ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё Рё СѓС‚РёР»РёС‚С‹;
+--   localutl   - СЃРѕР±РёСЂР°РµС‚ СЂР°Р·Р»РёС‡РЅС‹Рµ Р»РѕРєР°Р»СЊРЅС‹Рµ СѓС‚РёР»РёС‚С‹ РєР°Рє РЅРµР·Р°РІРёСЃРёРјС‹Рµ С‚Р°Рє Рё Р·Р°РІРёСЃРёРјС‹Рµ РѕС‚ lwml.
+--
+-- РџРµСЂРµРґ Р·Р°РїСѓСЃРєРѕРј СЃРєСЂРёРїС‚Р° РЅРµРѕР±С…РѕРґРёРјРѕ СѓР±РµРґРёС‚СЊСЃСЏ, С‡С‚Рѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅ РєР°Рє РјРёРЅРёРјСѓРј РјРѕРґСѓР»СЊ luafilesystem.
 
 dofile 'tools/istools.lua'
 
 --
--- Формируем список задач
+-- Р¤РѕСЂРјРёСЂСѓРµРј СЃРїРёСЃРѕРє Р·Р°РґР°С‡
 --
 
 local tasks = {}
@@ -28,7 +28,7 @@ for j = 1, #arg do
 end
 msg("Tasks: " .. tasks_str)
 
--- Используется только под Linux и OSX.
+-- РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРѕРґ Linux Рё OSX.
 local user_home = ''
 if os_type ~= 'windows' then
   user_home = get_env('HOME')
@@ -41,25 +41,25 @@ local repo_home = get_devenv_repo_path()
 local fmt = string.format
 
 --
--- Сбрасываем переменные среды
+-- РЎР±СЂР°СЃС‹РІР°РµРј РїРµСЂРµРјРµРЅРЅС‹Рµ СЃСЂРµРґС‹
 --
 
 if tasks['cleanenv'] then
   msg "Cleaning environment variables..."
 
-  -- В Windows приходится работать с реестром.
+  -- Р’ Windows РїСЂРёС…РѕРґРёС‚СЃСЏ СЂР°Р±РѕС‚Р°С‚СЊ СЃ СЂРµРµСЃС‚СЂРѕРј.
   if os_type == 'windows' then
     del_env("lwml_zzz", "")
     del_env("lua_path", "")
     del_env("lua_cpath", "")
     del_env("lwdg_home", "")
     del_env("wxwin", "")
-  
+
     path_tbl = split(get_env('path'))
     upath_tbl = split(get_user_path() or '')
-    
+
     local path_changed = false
-  
+
     function del_path( path )
       path = norm_path(path)
       if upath_tbl[path] then
@@ -69,11 +69,11 @@ if tasks['cleanenv'] then
         log('PATH-=' .. path)
       end
     end
-  
+
     del_path(home .. '/utils')
     del_path(home .. '/share')
     del_path(home .. '/lutils')
-  
+
     del_path(home .. "/wx/build-lwdg-dll/lib")
 
     if path_changed then
@@ -90,8 +90,8 @@ if tasks['cleanenv'] then
     end
   else
     -- (os_type == 'osx' or os_type == 'linux')
-    -- В unix-подобных операционных системах пути хранятся в переменных, которые записаны
-    -- в файле .devenv.    
+    -- Р’ unix-РїРѕРґРѕР±РЅС‹С… РѕРїРµСЂР°С†РёРѕРЅРЅС‹С… СЃРёСЃС‚РµРјР°С… РїСѓС‚Рё С…СЂР°РЅСЏС‚СЃСЏ РІ РїРµСЂРµРјРµРЅРЅС‹С…, РєРѕС‚РѕСЂС‹Рµ Р·Р°РїРёСЃР°РЅС‹
+    -- РІ С„Р°Р№Р»Рµ .devenv.
     local devenv = user_home .. '/.devenv'
     rmfile(devenv)
     mkfile(devenv)
@@ -102,12 +102,12 @@ if tasks['cleanenv'] then
 end
 
 --
--- Устанавливаем переменные среды
+-- РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїРµСЂРµРјРµРЅРЅС‹Рµ СЃСЂРµРґС‹
 --
 
 if tasks['setenv'] then
   msg "Setting environment variables..."
- 
+
   local env = {
     LWML_ZZZ  = ":log:dump:jit",
     LWDG_HOME = home,
@@ -116,35 +116,35 @@ if tasks['setenv'] then
                   and string.format("%s;./?.dll;%s/share/?.dll", package.cpath, home)
                   or  string.format("%s;./?.so;%s/share/?.so", package.cpath, home),
   }
-  
+
   if os_type ~= 'windows' then
     env.LD_LIBRARY_PATH = home .. '/share'
   end
-  
+
   local local_paths = {
     'utils',
     'share',
     'lutils',
   }
-  
+
   if os_type == 'windows' then
     local pe = get_env('pathext')
     local pe_tbl = split(pe)
-    
+
     if not pe_tbl['.lua'] then
       set_env('pathext', pe .. ';.lua')
     end
-    
+
     for k, v in pairs(env) do
       set_env(k, v)
     end
-    
+
     log('# current path: <' .. get_env('path') ..'>')
-    
+
     local path_tbl = split(get_env('path'))
     local upath_tbl = split(get_user_path() or '')
     local path_changed = false
-    
+
     local function test_path( path )
       path = norm_path(path)
       if not path_tbl[path] then
@@ -154,11 +154,11 @@ if tasks['setenv'] then
         log('PATH+=' .. path)
       end
     end
-    
+
     for _, v in pairs(local_paths) do
       test_path(home .. '/' .. v)
     end
-  
+
     if path_changed then
       msg "  Setting PATH..."
       set_user_env('path', join(upath_tbl))
@@ -168,27 +168,27 @@ if tasks['setenv'] then
     end
   else
     local devenv = io.open(user_home .. '/.devenv', 'w')
-    
-    -- ! зачем нужна переменная среды pathext?
-    
+
+    -- ! Р·Р°С‡РµРј РЅСѓР¶РЅР° РїРµСЂРµРјРµРЅРЅР°СЏ СЃСЂРµРґС‹ pathext?
+
     for k, v in pairs(env) do
       devenv:write('export ', k, "='", v, "'\n")
     end
     devenv:write('\n')
-    
+
     for i, path in pairs(local_paths) do
       local_paths[i] = home .. '/' .. path
     end
     devenv:write("export PATH='", table.concat(local_paths, ":"), "':$PATH\n")
     devenv:write("export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH\n")
-    
+
     if devenv then
       devenv:close()
     end
-    
+
     msg "  .devenv was successfully written"
-    
-    -- Сначала необходимо определить какая оболочка shell используется.
+
+    -- РЎРЅР°С‡Р°Р»Р° РЅРµРѕР±С…РѕРґРёРјРѕ РѕРїСЂРµРґРµР»РёС‚СЊ РєР°РєР°СЏ РѕР±РѕР»РѕС‡РєР° shell РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ.
     local rc_name
     local shell = pipe('echo $SHELL')
     if shell:match('zsh') then
@@ -196,25 +196,25 @@ if tasks['setenv'] then
     elseif shell:match('bash') then
       rc_name = '.bashrc'
     end
-    
+
     if not rc_name then
       stop('Could not determine shell type (supported: zsh, bash)')
     end
-    
-    -- Бэкап конфига.
+
+    -- Р‘СЌРєР°Рї РєРѕРЅС„РёРіР°.
     local rc_filepath = user_home .. '/' .. rc_name
     local rc_filepath_orig = rc_filepath .. '.orig'
-    
+
     if not is_file(rc_filepath_orig) then
       execf('cp', '%s %s', rc_filepath, rc_filepath_orig)
     end
-    
-    -- Проверка на наличие строки загрузки .devenv в конфиге. Если она есть, то
-    -- ещё раз её писать не надо.
+
+    -- РџСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ СЃС‚СЂРѕРєРё Р·Р°РіСЂСѓР·РєРё .devenv РІ РєРѕРЅС„РёРіРµ. Р•СЃР»Рё РѕРЅР° РµСЃС‚СЊ, С‚Рѕ
+    -- РµС‰С‘ СЂР°Р· РµС‘ РїРёСЃР°С‚СЊ РЅРµ РЅР°РґРѕ.
     local rc = assert(io.open(rc_filepath, 'r'))
     local rc_contents = rc:read('*a')
     rc:close()
-    
+
     if not rc_contents:match('source ~/%.devenv') then
       rc = assert(io.open(rc_filepath, 'a'))
       rc:write('\n')
@@ -226,14 +226,14 @@ if tasks['setenv'] then
     end
   end
 end
- 
+
 --
--- Проверяем наличие программ и их версии
+-- РџСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ РїСЂРѕРіСЂР°РјРј Рё РёС… РІРµСЂСЃРёРё
 --
 if tasks['testprg'] then
 
   msg "Testing standard programs..."
-  
+
   local progs = {}
   if os_type == 'windows' then
     progs = {
@@ -248,20 +248,20 @@ if tasks['testprg'] then
       ['bash'] = 'please, install bash',
       ['strip'] = 'please, install strip',
       ['gcc'] = 'please, install gcc',
-      ['g++'] = 'please, install g++',  
+      ['g++'] = 'please, install g++',
     }
-    
-    -- Для OSX проверку на strip надо какую-то другую, т.к.
-    -- у него нет аргументов --version и -v, а при запуске выдаёт ошибку.
+
+    -- Р”Р»СЏ OSX РїСЂРѕРІРµСЂРєСѓ РЅР° strip РЅР°РґРѕ РєР°РєСѓСЋ-С‚Рѕ РґСЂСѓРіСѓСЋ, С‚.Рє.
+    -- Сѓ РЅРµРіРѕ РЅРµС‚ Р°СЂРіСѓРјРµРЅС‚РѕРІ --version Рё -v, Р° РїСЂРё Р·Р°РїСѓСЃРєРµ РІС‹РґР°С‘С‚ РѕС€РёР±РєСѓ.
     if os_type == 'osx' then
       progs['strip'] = nil
     end
   end
-  
+
   for prog, msg in pairs(progs) do
     test_exist(prog, msg)
   end
-  
+
   if os_type == 'windows' then
     test_ver('sh.exe', '2.04.0')
     test_ver('gcc.exe', '3.4.5')
@@ -271,7 +271,7 @@ if tasks['testprg'] then
 end
 
 --
--- Создаем отсутствующие поддиректории домашнего каталога
+-- РЎРѕР·РґР°РµРј РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёРµ РїРѕРґРґРёСЂРµРєС‚РѕСЂРёРё РґРѕРјР°С€РЅРµРіРѕ РєР°С‚Р°Р»РѕРіР°
 --
 
 if tasks['createtree'] then
@@ -283,7 +283,7 @@ if tasks['createtree'] then
   else
     shell = 'bash'
   end
-  
+
   execf(shell, '-c "mkdir -p %s/include"', home)
   execf(shell, '-c "mkdir -p %s/lib"', home)
   execf(shell, '-c "mkdir -p %s/lutils/lib"', home)
@@ -293,7 +293,7 @@ if tasks['createtree'] then
 end
 
 --
--- Регистрируем расширение .lua. Только для Windows
+-- Р РµРіРёСЃС‚СЂРёСЂСѓРµРј СЂР°СЃС€РёСЂРµРЅРёРµ .lua. РўРѕР»СЊРєРѕ РґР»СЏ Windows
 --
 
 if tasks['reglua'] then
@@ -306,68 +306,69 @@ if tasks['reglua'] then
 end
 
 --
--- Построение lua-подсистемы
+-- РџРѕСЃС‚СЂРѕРµРЅРёРµ lua-РїРѕРґСЃРёСЃС‚РµРјС‹
 --
 
 if tasks['lutils'] then
   msg("Building lua utilities in " .. home .. '/lutils')
 
-  -- Копируем lua-утилиты.
+  -- РљРѕРїРёСЂСѓРµРј lua-СѓС‚РёР»РёС‚С‹.
   lua_make('lutils', 'setup.lua')
 
-  -- Под Linux и OSX не нужно собирать llake и lred в exe, поэтому для всех утилит
-  -- нужно создать симлинки без расширений и дописать в начало файла #!, чтобы
-  -- можно было запускать.
+  -- РџРѕРґ Linux Рё OSX РЅРµ РЅСѓР¶РЅРѕ СЃРѕР±РёСЂР°С‚СЊ llake Рё lred РІ exe, РїРѕСЌС‚РѕРјСѓ РґР»СЏ РІСЃРµС… СѓС‚РёР»РёС‚
+  -- РЅСѓР¶РЅРѕ СЃРѕР·РґР°С‚СЊ СЃРёРјР»РёРЅРєРё Р±РµР· СЂР°СЃС€РёСЂРµРЅРёР№ Рё РґРѕРїРёСЃР°С‚СЊ РІ РЅР°С‡Р°Р»Рѕ С„Р°Р№Р»Р° #!, С‡С‚РѕР±С‹
+  -- РјРѕР¶РЅРѕ Р±С‹Р»Рѕ Р·Р°РїСѓСЃРєР°С‚СЊ.
   if os_type ~= 'windows' then
     execf('cp', '%s/lutils/llake/llake.lua %s/lutils/llake.lua ', repo_home, home)
     execf('cp', '%s/lutils/utils/lred.lua %s/lutils/lred.lua ', repo_home, home)
 
-    -- Все файлы с расширением .lua.
+    -- Р’СЃРµ С„Р°Р№Р»С‹ СЃ СЂР°СЃС€РёСЂРµРЅРёРµРј .lua.
     local cmd = fmt("find '%s/lutils' -maxdepth 1 -type f -iname '*.lua' | sed s,^./,,", home)
     local dir = assert(io.popen(cmd))
-    
+
     for filepath in dir:lines() do
-      -- Т.к. файлы небольшие, то можно считывать их в память и уже потом дописывать строку в начало.
+      -- Рў.Рє. С„Р°Р№Р»С‹ РЅРµР±РѕР»СЊС€РёРµ, С‚Рѕ РјРѕР¶РЅРѕ СЃС‡РёС‚С‹РІР°С‚СЊ РёС… РІ РїР°РјСЏС‚СЊ Рё СѓР¶Рµ РїРѕС‚РѕРј РґРѕРїРёСЃС‹РІР°С‚СЊ СЃС‚СЂРѕРєСѓ РІ РЅР°С‡Р°Р»Рѕ.
       local file = assert(io.open(filepath, 'r'))
       local filename = get_filename(filepath)
       local script = file:read('*a')
       local message = ''
       file:close()
-      
+
       message = filename .. ':'
-      
+
       local hashbang = '#!/usr/bin/env lua'
-      -- Проверяем есть ли #! в самом начале файла, если нет, то добавляем.
+      -- РџСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё #! РІ СЃР°РјРѕРј РЅР°С‡Р°Р»Рµ С„Р°Р№Р»Р°, РµСЃР»Рё РЅРµС‚, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј.
       if not script:match('^' .. hashbang) then
         file = assert(io.open(filepath ,'w'))
         file:write(hashbang .. '\n\n')
         file:write(script)
         file:close()
-      end 
-      
+      end
+
       execf('chmod', 'u+x %s', filepath)
-      
-      -- Создаём симлинк, чтобы можно было запускать скрипты без расширения .lua.
+
+      -- РЎРѕР·РґР°С‘Рј СЃРёРјР»РёРЅРє, С‡С‚РѕР±С‹ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ Р·Р°РїСѓСЃРєР°С‚СЊ СЃРєСЂРёРїС‚С‹ Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ .lua.
       local link_name = filepath:gsub('(.*)(%.lua)', '%1')
       if not is_file(link_name) then
-        execf('ln', '-s %s %s', filepath, link_name)
-        message = message .. "\tcreated symlink."
+        message = message .. "\tok"
       else
-        message = message .. "\tsymlink exists."
+        execf('rm', '%s', link_name)
+        message = message .. "\trecreated symlink"
       end
+      execf('ln', '-s %s %s', filepath, link_name)
       msg(message)
     end
-    
+
     dir:close()
   end
 end
 
 --
--- Сборка внешних утилит
+-- РЎР±РѕСЂРєР° РІРЅРµС€РЅРёС… СѓС‚РёР»РёС‚
 --
 
 if tasks['lua'] then
-  -- Собираем lua.
+  -- РЎРѕР±РёСЂР°РµРј lua.
   msg "  Building lua interpreter..."
 
   local lua_path = 'third-party/lua-addons/setup'
@@ -379,21 +380,21 @@ if tasks['lua'] then
   else
     lua_make(lua_path, 'build_lua.lua')
 
-    -- В OSX 10.11 (El Capitan) теперь DYLD_LIBRARY_PATH не экспортируется в дочерние процессы,
-    -- приходится делать ссылку в папке usr/local/lib.
+    -- Р’ OSX 10.11 (El Capitan) С‚РµРїРµСЂСЊ DYLD_LIBRARY_PATH РЅРµ СЌРєСЃРїРѕСЂС‚РёСЂСѓРµС‚СЃСЏ РІ РґРѕС‡РµСЂРЅРёРµ РїСЂРѕС†РµСЃСЃС‹,
+    -- РїСЂРёС…РѕРґРёС‚СЃСЏ РґРµР»Р°С‚СЊ СЃСЃС‹Р»РєСѓ РІ РїР°РїРєРµ usr/local/lib.
     if os_type == 'osx' and not is_file('/usr/local/lib/liblua52.so') then
         execf('ln -s', home .. '/share/liblua52.so ' .. '/usr/local/lib')
     end
   end
-  
-  -- Собираем сторонние lua-модули.
+
+  -- РЎРѕР±РёСЂР°РµРј СЃС‚РѕСЂРѕРЅРЅРёРµ lua-РјРѕРґСѓР»Рё.
   msg "  Building lua module lfs"
   lua_make(lua_path, 'build_lfs.lua')
 end
 
 if tasks['extutl'] then
   msg "Building external utilities..."
-  
+
   msg "  Building libjpeg..."
   lua_make('third-party/libjpeg')
 
@@ -402,28 +403,28 @@ if tasks['extutl'] then
 
   msg "  Building libtiff..."
   lua_make('third-party/libtiff')
-  
+
   if os_type == 'windows' then
-    -- @Todo: с Lua 5.2 не собирается. Ругается на luaL_putchar().
+    -- @Todo: СЃ Lua 5.2 РЅРµ СЃРѕР±РёСЂР°РµС‚СЃСЏ. Р СѓРіР°РµС‚СЃСЏ РЅР° luaL_putchar().
     -- msg "  Building lua module md5"
     -- lua_make(lua_path, 'build_md5.lua')
-    
-    -- Компилируем специфичные lua-скрипты.
+
+    -- РљРѕРјРїРёР»РёСЂСѓРµРј СЃРїРµС†РёС„РёС‡РЅС‹Рµ lua-СЃРєСЂРёРїС‚С‹.
     msg "  Building lua scripts..."
-    
+
     local hlpath = repo_home .. '/lutils'
     execf('lua', '%s/lutils/luaccc.lua lred.exe %s/utils/lred.lua >nul', home, hlpath)
     execf('lua', '%s/lutils/luaccc.lua llake.exe %s/llake/llake.lua >nul', home, hlpath)
     execf('mv', 'lred.exe llake.exe %s/utils', home)
-    
-    -- Собираем сторонние утилиты.
+
+    -- РЎРѕР±РёСЂР°РµРј СЃС‚РѕСЂРѕРЅРЅРёРµ СѓС‚РёР»РёС‚С‹.
     msg "  Building additional utilities..."
     lua_make('third-party/ccalc')
     lua_make('third-party/dbmon')
     lua_make('third-party/winutl')
     lua_make('third-party/jpeg2ps')
     lua_make('third-party/mimetex')
-    
+
     if not is_file(home .. '/share/libiconv2.dll') then
       msg("** can't find <libiconv2.dll>, building luaiconv.dll skipped")
     else
@@ -439,31 +440,31 @@ if tasks['md5'] then
 end
 
 --
--- Сборка утилит и библиотек, использующих при сборке llake.
+-- РЎР±РѕСЂРєР° СѓС‚РёР»РёС‚ Рё Р±РёР±Р»РёРѕС‚РµРє, РёСЃРїРѕР»СЊР·СѓСЋС‰РёС… РїСЂРё СЃР±РѕСЂРєРµ llake.
 --
 if tasks['localutl'] then
   msg "Building local utilities..."
 
-  -- @Todo: переписать под Linux: lswg, lualwml, limlib.
+  -- @Todo: РїРµСЂРµРїРёСЃР°С‚СЊ РїРѕРґ Linux: lswg, lualwml, limlib.
 
   if os_type == 'windows' then
-    -- Независимые от lwml утилиты.
+    -- РќРµР·Р°РІРёСЃРёРјС‹Рµ РѕС‚ lwml СѓС‚РёР»РёС‚С‹.
     llake_make('secluded/ldatav', 'ldatav.exe', 'utils')
     llake_make('secluded/limlib', 'limlib.dll', 'share')
     llake_make('secluded/llogsrv', 'llogsrv.dll', 'share')
-  
-    -- Зависимые от lwml утилиты.
+
+    -- Р—Р°РІРёСЃРёРјС‹Рµ РѕС‚ lwml СѓС‚РёР»РёС‚С‹.
     llake_make('lwml-dep/dllver', 'dllver.exe', 'utils')
     llake_make('lwml-dep/limcov', 'limcov.dll', 'share')
-    
+
     llake_make('lualib/lswg', 'lswg.dll', 'share')
-    
-    -- @Todo: не собирается с Lua 5.2.
+
+    -- @Todo: РЅРµ СЃРѕР±РёСЂР°РµС‚СЃСЏ СЃ Lua 5.2.
     -- llake_make('lualib/lswp', 'lswp.dll', 'share')
     llake_make('lualib/lualwml', 'lualwml.dll', 'share')
     llake_make('lwml-dep/lwhich', 'lwhich.exe', 'utils')
-  
-    -- Копирование.
+
+    -- РљРѕРїРёСЂРѕРІР°РЅРёРµ.
     local hlc_path = '../lwml-dep/limcov'
     execf('cp', '%s/limcov_dll.h %s/include', hlc_path, home)
     execf('cp', '%s/limcov.a %s/lib/liblimcov.a', hlc_path, home)

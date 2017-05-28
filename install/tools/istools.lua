@@ -14,7 +14,7 @@ function try_require(module)
 end
 
 --
--- Файловая система
+-- Р¤Р°Р№Р»РѕРІР°СЏ СЃРёСЃС‚РµРјР°
 --
 
 local lfs = try_require 'lfs'
@@ -23,7 +23,7 @@ if not lfs then
   function cwd()
     return istools.cwd()
   end
-  
+
   function chdir( path )
     return istools.chdir(path)
   end
@@ -31,13 +31,13 @@ else
   function cwd()
     return lfs.currentdir()
   end
-  
+
   function chdir( path )
     return lfs.chdir(path)
   end
 end
 
---- Проверка файла на существование в файловой системе.
+--- РџСЂРѕРІРµСЂРєР° С„Р°Р№Р»Р° РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РІ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ.
 function is_file( nm )
   local file = io.open(nm, 'rb')
   local res = (file ~= nil)
@@ -60,7 +60,7 @@ function rmfile( filepath )
   end
 end
 
---- Генерирует временное имя файла.
+--- Р“РµРЅРµСЂРёСЂСѓРµС‚ РІСЂРµРјРµРЅРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°.
 function tmpfname()
   local fname = os.tmpname()
   if os_type == 'windows' then
@@ -70,31 +70,31 @@ function tmpfname()
 end
 
 --
--- Поддержка лога операций.
+-- РџРѕРґРґРµСЂР¶РєР° Р»РѕРіР° РѕРїРµСЂР°С†РёР№.
 --
 
--- Создаем пустой файл для лога.
+-- РЎРѕР·РґР°РµРј РїСѓСЃС‚РѕР№ С„Р°Р№Р» РґР»СЏ Р»РѕРіР°.
 local log_fnm = cwd() .. '/temp/install_lwdg.log'
 mkfile(log_fnm)
 
---- Записывает сообщение в лог.
+--- Р—Р°РїРёСЃС‹РІР°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ РІ Р»РѕРі.
 function log( what )
   local f = assert(io.open(log_fnm, 'a'))
   f:write(what .. '\n')
   f:close()
 end
 
---- Выводит сообщение на экран и записывает его в лог.
+--- Р’С‹РІРѕРґРёС‚ СЃРѕРѕР±С‰РµРЅРёРµ РЅР° СЌРєСЂР°РЅ Рё Р·Р°РїРёСЃС‹РІР°РµС‚ РµРіРѕ РІ Р»РѕРі.
 function msg( what )
   io.write(what .. '\n')
   log('# ' .. what)
 end
 
 --
--- Обработка ошибок.
+-- РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РѕРє.
 --
 
---- Прерывает выполнение скрипта и выводит сообщение об ошибке на экран.
+--- РџСЂРµСЂС‹РІР°РµС‚ РІС‹РїРѕР»РЅРµРЅРёРµ СЃРєСЂРёРїС‚Р° Рё РІС‹РІРѕРґРёС‚ СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ РЅР° СЌРєСЂР°РЅ.
 function stop( ... )
   local msg = string.format(...)
 
@@ -108,7 +108,7 @@ function stop( ... )
   os.exit(1)
 end
 
---- Проверяет наличие программы.
+--- РџСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ РїСЂРѕРіСЂР°РјРјС‹.
 function test_exist( prog, msg )
   local args = os_type == 'windows'
                  and '--version >nul 2>nul'
@@ -120,8 +120,8 @@ function test_exist( prog, msg )
   end
 end
 
---- Проверяет версию программы.
--- Предполагается, что программа имеется в системе.
+--- РџСЂРѕРІРµСЂСЏРµС‚ РІРµСЂСЃРёСЋ РїСЂРѕРіСЂР°РјРјС‹.
+-- РџСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ РїСЂРѕРіСЂР°РјРјР° РёРјРµРµС‚СЃСЏ РІ СЃРёСЃС‚РµРјРµ.
 function test_ver( prog, ver )
   local fn = tmpfname()
   local args = os_type == 'windows'
@@ -130,7 +130,7 @@ function test_ver( prog, ver )
   if execf_unp(prog, args .. fn) ~= success_code then
     stop("can't run <%s>", prog)
   end
-  
+
   local file = assert(io.open(fn, 'r'))
   local pver = file:read('*line')
   file:close()
@@ -152,10 +152,10 @@ function test_ver( prog, ver )
 end
 
 --
--- Работа с путями.
+-- Р Р°Р±РѕС‚Р° СЃ РїСѓС‚СЏРјРё.
 --
 
---- Заменяет обратные слеши \ на прямые /, также заменяет двойные прямые // слеши на одиночные /.
+--- Р—Р°РјРµРЅСЏРµС‚ РѕР±СЂР°С‚РЅС‹Рµ СЃР»РµС€Рё \ РЅР° РїСЂСЏРјС‹Рµ /, С‚Р°РєР¶Рµ Р·Р°РјРµРЅСЏРµС‚ РґРІРѕР№РЅС‹Рµ РїСЂСЏРјС‹Рµ // СЃР»РµС€Рё РЅР° РѕРґРёРЅРѕС‡РЅС‹Рµ /.
 function norm_path( path )
   path = path:gsub('\\', '/')
   while path:match('//') do
@@ -164,10 +164,10 @@ function norm_path( path )
   return path
 end
 
---- Разбивает строку path используя разделитель ";" (точку с запятой).
--- 
--- Возвращает таблицу, где ключ - нормированная строка, а значение - исходная строка.
--- Т.е. "foo/bar;xxx\baz" будет разбито на:
+--- Р Р°Р·Р±РёРІР°РµС‚ СЃС‚СЂРѕРєСѓ path РёСЃРїРѕР»СЊР·СѓСЏ СЂР°Р·РґРµР»РёС‚РµР»СЊ ";" (С‚РѕС‡РєСѓ СЃ Р·Р°РїСЏС‚РѕР№).
+--
+-- Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚Р°Р±Р»РёС†Сѓ, РіРґРµ РєР»СЋС‡ - РЅРѕСЂРјРёСЂРѕРІР°РЅРЅР°СЏ СЃС‚СЂРѕРєР°, Р° Р·РЅР°С‡РµРЅРёРµ - РёСЃС…РѕРґРЅР°СЏ СЃС‚СЂРѕРєР°.
+-- Рў.Рµ. "foo/bar;xxx\baz" Р±СѓРґРµС‚ СЂР°Р·Р±РёС‚Рѕ РЅР°:
 -- {
 --    "foo/bar" = "foo/bar",
 --    "xxx/baz" = "xxx\baz"
@@ -180,14 +180,14 @@ function split( path )
   return res
 end
 
---- Собирает из таблицы строку состоящую из элементов таблицы, которые разделены точкой с запятой.
--- Функция обратная к функции split().
--- Т.е. таблица:
+--- РЎРѕР±РёСЂР°РµС‚ РёР· С‚Р°Р±Р»РёС†С‹ СЃС‚СЂРѕРєСѓ СЃРѕСЃС‚РѕСЏС‰СѓСЋ РёР· СЌР»РµРјРµРЅС‚РѕРІ С‚Р°Р±Р»РёС†С‹, РєРѕС‚РѕСЂС‹Рµ СЂР°Р·РґРµР»РµРЅС‹ С‚РѕС‡РєРѕР№ СЃ Р·Р°РїСЏС‚РѕР№.
+-- Р¤СѓРЅРєС†РёСЏ РѕР±СЂР°С‚РЅР°СЏ Рє С„СѓРЅРєС†РёРё split().
+-- Рў.Рµ. С‚Р°Р±Р»РёС†Р°:
 -- {
 --    "foo/bar" = "foo/bar",
 --    "xxx/baz" = "xxx\baz"
 -- }
--- будет собрана в "foo/bar;xxx\baz".
+-- Р±СѓРґРµС‚ СЃРѕР±СЂР°РЅР° РІ "foo/bar;xxx\baz".
 function join( tbl )
   local res = ''
   for _, v in pairs(tbl) do
@@ -208,9 +208,9 @@ function get_filename( filepath )
   return segment
 end
 
--- Внимание! Здесь предполагается, что на два уровня вверх по файловой системе
--- расположена корневая директория рабочего окружения.
--- Это гарантируется запуском скрипта из директории install репозитория devenv.
+-- Р’РЅРёРјР°РЅРёРµ! Р—РґРµСЃСЊ РїСЂРµРґРїРѕР»Р°РіР°РµС‚СЃСЏ, С‡С‚Рѕ РЅР° РґРІР° СѓСЂРѕРІРЅСЏ РІРІРµСЂС… РїРѕ С„Р°Р№Р»РѕРІРѕР№ СЃРёСЃС‚РµРјРµ
+-- СЂР°СЃРїРѕР»РѕР¶РµРЅР° РєРѕСЂРЅРµРІР°СЏ РґРёСЂРµРєС‚РѕСЂРёСЏ СЂР°Р±РѕС‡РµРіРѕ РѕРєСЂСѓР¶РµРЅРёСЏ.
+-- Р­С‚Рѕ РіР°СЂР°РЅС‚РёСЂСѓРµС‚СЃСЏ Р·Р°РїСѓСЃРєРѕРј СЃРєСЂРёРїС‚Р° РёР· РґРёСЂРµРєС‚РѕСЂРёРё install СЂРµРїРѕР·РёС‚РѕСЂРёСЏ devenv.
 function get_home_path()
   local cwd = norm_path(cwd())
   local cwd_tbl = {}
@@ -218,13 +218,13 @@ function get_home_path()
   for s in cwd:gmatch('[^/]+') do
     table.insert(cwd_tbl, s)
   end
-  
+
   local home = table.concat(cwd_tbl, '/', 1, #cwd_tbl - 2)
-  
+
   if os_type ~= 'windows' then
     home = '/' .. home
   end
-  
+
   return home
 end
 
@@ -235,21 +235,21 @@ function get_devenv_repo_path()
   for s in cwd:gmatch('[^/]+') do
     table.insert(cwd_tbl, s)
   end
-  
+
   local home = table.concat(cwd_tbl, '/', 1, #cwd_tbl - 1)
-  
+
   if os_type ~= 'windows' then
     home = '/' .. home
   end
-  
+
   return home
 end
 
 --
--- Выполнение команд
+-- Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґ
 --
 
---- Нормализование строки команды. В случае windows заменяет прямые слеши / на обратные \.
+--- РќРѕСЂРјР°Р»РёР·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё РєРѕРјР°РЅРґС‹. Р’ СЃР»СѓС‡Р°Рµ windows Р·Р°РјРµРЅСЏРµС‚ РїСЂСЏРјС‹Рµ СЃР»РµС€Рё / РЅР° РѕР±СЂР°С‚РЅС‹Рµ \.
 local function norm_cmd_name( cmd )
   if os_type == 'windows' then
     return cmd:gsub('/', '\\')
@@ -258,15 +258,15 @@ local function norm_cmd_name( cmd )
   end
 end
 
---- Выполняет команду cmd и записывает строку команды в лог.
+--- Р’С‹РїРѕР»РЅСЏРµС‚ РєРѕРјР°РЅРґСѓ cmd Рё Р·Р°РїРёСЃС‹РІР°РµС‚ СЃС‚СЂРѕРєСѓ РєРѕРјР°РЅРґС‹ РІ Р»РѕРі.
 function execf_unp( cmd, ... )
   local cmdl = norm_cmd_name(cmd) .. ' ' .. string.format(...)
   log(cmdl)
   return os.execute(cmdl)
 end
 
---- Делает вызов предыдущей функции execf_unp().
--- Если выполнить команду не удалось, то завершает работу скрипта.
+--- Р”РµР»Р°РµС‚ РІС‹Р·РѕРІ РїСЂРµРґС‹РґСѓС‰РµР№ С„СѓРЅРєС†РёРё execf_unp().
+-- Р•СЃР»Рё РІС‹РїРѕР»РЅРёС‚СЊ РєРѕРјР°РЅРґСѓ РЅРµ СѓРґР°Р»РѕСЃСЊ, С‚Рѕ Р·Р°РІРµСЂС€Р°РµС‚ СЂР°Р±РѕС‚Сѓ СЃРєСЂРёРїС‚Р°.
 function execf( cmd, ... )
   if execf_unp(cmd, ...) ~= success_code then
     stop("can't execute <%s>", string.format(...))
@@ -280,8 +280,8 @@ function pipe( cmd )
   return res
 end
 
---- Изменяет рабочую директорию относительно папки репозитория и выполняет команду cmd.
--- Здесь делается предположение, что на уровень выше находится корень репозитория.
+--- РР·РјРµРЅСЏРµС‚ СЂР°Р±РѕС‡СѓСЋ РґРёСЂРµРєС‚РѕСЂРёСЋ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РїР°РїРєРё СЂРµРїРѕР·РёС‚РѕСЂРёСЏ Рё РІС‹РїРѕР»РЅСЏРµС‚ РєРѕРјР°РЅРґСѓ cmd.
+-- Р—РґРµСЃСЊ РґРµР»Р°РµС‚СЃСЏ РїСЂРµРґРїРѕР»РѕР¶РµРЅРёРµ, С‡С‚Рѕ РЅР° СѓСЂРѕРІРµРЅСЊ РІС‹С€Рµ РЅР°С…РѕРґРёС‚СЃСЏ РєРѕСЂРµРЅСЊ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ.
 function cdrun( path, cmd, ... )
   local sp = cwd()
   chdir('../' .. path)
@@ -294,12 +294,12 @@ function cdrun( path, cmd, ... )
   end
 end
 
---- Выполняет переход в path с помощью функции cdrun() и выполняет указанный скрипт script на Lua.
--- Если script не указан, то по умолчанию выполняется make.lua по указанному пути.
+--- Р’С‹РїРѕР»РЅСЏРµС‚ РїРµСЂРµС…РѕРґ РІ path СЃ РїРѕРјРѕС‰СЊСЋ С„СѓРЅРєС†РёРё cdrun() Рё РІС‹РїРѕР»РЅСЏРµС‚ СѓРєР°Р·Р°РЅРЅС‹Р№ СЃРєСЂРёРїС‚ script РЅР° Lua.
+-- Р•СЃР»Рё script РЅРµ СѓРєР°Р·Р°РЅ, С‚Рѕ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ make.lua РїРѕ СѓРєР°Р·Р°РЅРЅРѕРјСѓ РїСѓС‚Рё.
 function lua_make( path, script )
   local cwd = cwd()
   local std_lua
-  
+
   script = script or 'make.lua'
   local to_null = os_type == 'windows' and ' >nul' or ' 1>/dev/null 2>/dev/null'
   script = script .. to_null
@@ -309,7 +309,7 @@ function lua_make( path, script )
   else
     std_lua = cwd .. "/temp/standalone-lua.exe"
   end
-    
+
   cdrun(path, std_lua, script)
 end
 
@@ -317,26 +317,26 @@ local home = get_home_path()
 
 function llake_make( path, name, dst )
   local arguments
-  
+
   if os_type == 'windows' then
-    arguments = '-s make build.llk 2>nul 1>nul'
+    arguments = 'build.llk make -s 2>nul 1>nul'
   else
-    arguments = 'make build.llk 1>/dev/null 2>/dev/null'
+    arguments = 'build.llk make 1>/dev/null 2>/dev/null'
   end
-  
+
   cdrun(path, 'llake', arguments)
-  
+
   local src = '../' .. path .. '/' .. name
   local dst = home .. '/' .. dst
   execf("mv", "%s %s", src, dst)
 end
 
 --
--- Ассоциации win32
+-- РђСЃСЃРѕС†РёР°С†РёРё win32
 --
 
---- Эта функция выполняет задачи, недоступные для assoc/ftype
--- Она успешно регистрирует новый тип файлов из-под ограниченного аккаунта.
+--- Р­С‚Р° С„СѓРЅРєС†РёСЏ РІС‹РїРѕР»РЅСЏРµС‚ Р·Р°РґР°С‡Рё, РЅРµРґРѕСЃС‚СѓРїРЅС‹Рµ РґР»СЏ assoc/ftype
+-- РћРЅР° СѓСЃРїРµС€РЅРѕ СЂРµРіРёСЃС‚СЂРёСЂСѓРµС‚ РЅРѕРІС‹Р№ С‚РёРї С„Р°Р№Р»РѕРІ РёР·-РїРѕРґ РѕРіСЂР°РЅРёС‡РµРЅРЅРѕРіРѕ Р°РєРєР°СѓРЅС‚Р°.
 function reg_ext( ext, typeid, act )
   -- damned windows understand '/' everywhere but here
   act = act:gsub('/', '\\')
@@ -351,7 +351,7 @@ function reg_ext( ext, typeid, act )
 end
 
 --
--- Работа с переменными окружения
+-- Р Р°Р±РѕС‚Р° СЃ РїРµСЂРµРјРµРЅРЅС‹РјРё РѕРєСЂСѓР¶РµРЅРёСЏ
 --
 
 function get_env( var )
