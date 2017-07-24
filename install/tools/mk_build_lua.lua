@@ -55,7 +55,7 @@ case $UNAME in
   ;;
   Darwin*)
     brew install readline
-    g++ -O2 -Wall -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX -otemp/standalone-lua $SRC_LIST \
+    clang++ -O2 -Wall -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX -otemp/standalone-lua $SRC_LIST \
       ]] .. lua_path .. [[/istools.c ]] .. lua_path .. [[/linit_istools.c -lm -lreadline
   ;;
 esac

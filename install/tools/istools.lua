@@ -17,24 +17,12 @@ end
 -- Файловая система
 --
 
-local lfs = try_require 'lfs'
+function cwd()
+  return istools.cwd()
+end
 
-if not lfs then
-  function cwd()
-    return istools.cwd()
-  end
-
-  function chdir( path )
-    return istools.chdir(path)
-  end
-else
-  function cwd()
-    return lfs.currentdir()
-  end
-
-  function chdir( path )
-    return lfs.chdir(path)
-  end
+function chdir( path )
+  return istools.chdir(path)
 end
 
 --- Проверка файла на существование в файловой системе.
@@ -304,10 +292,10 @@ function lua_make( path, script )
   local to_null = os_type == 'windows' and ' >nul' or ' 1>/dev/null 2>/dev/null'
   script = script .. to_null
 
-  if (os_type == 'linux' or os_type == 'osx') then
-    std_lua = 'lua'
-  else
+  if os_type == 'windows' then
     std_lua = cwd .. "/temp/standalone-lua.exe"
+  else
+    std_lua = cwd .. "/temp/standalone-lua"
   end
 
   cdrun(path, std_lua, script)
@@ -319,9 +307,9 @@ function llake_make( path, name, dst )
   local arguments
 
   if os_type == 'windows' then
-    arguments = 'build.llk make -s 2>nul 1>nul'
+    arguments = 'build.llk -s 2>nul 1>nul'
   else
-    arguments = 'build.llk make 1>/dev/null 2>/dev/null'
+    arguments = 'build.llk 1>/dev/null 2>/dev/null'
   end
 
   cdrun(path, 'llake', arguments)

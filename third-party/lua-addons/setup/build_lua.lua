@@ -26,7 +26,7 @@ if os_type == 'windows' then
   __("gcc -static -o lua.exe -O2 -Wall " .. src_path .. "lua.c liblua52.a")
   __("gcc -static -o luac.exe -O2 -Wall " .. src_path .. "luac.c " .. mlist)
   __("strip --strip-unneeded lua52.dll lua.exe luac.exe")
-  
+
   __("mv lua52.dll " .. share)
   __("mv lua.exe " .. utils)
   __("mv luac.exe " .. utils)
@@ -34,23 +34,23 @@ if os_type == 'windows' then
 elseif os_type == 'osx' then
   local defs = '-DLUA_COMPAT_ALL -DLUA_USE_MACOSX'
   local libs = '-lm -ldl -lreadline'
-  
+
   __("gcc -O2 -Wall " .. defs .. " -c " .. mlist)
-  
+
   __("ar rcu liblua52.a " .. olist)
   __("ranlib liblua52.a")
-  
+
   __("gcc -O2 -Wall -dynamiclib -flat_namespace " .. defs .. " -o liblua52.so " .. olist .. "")
   __("rm " .. olist)
 
   __("gcc -O2 -Wall " .. defs .. " -c -o lua.o " .. src_path .. "lua.c");
   __("gcc -o lua lua.o liblua52.so " .. libs);
-  
+
   __("gcc -O2 -Wall " .. defs .. " -c -o luac.o " .. src_path .. "luac.c");
   __("gcc -o luac luac.o liblua52.a " .. libs);
-  
+
   __("rm lua.o luac.o")
-  
+
   __("mv liblua52.so " .. share)
   __("mv liblua52.a " .. lib)
   __("mv lua " .. utils)
@@ -58,22 +58,22 @@ elseif os_type == 'osx' then
 else
   local defs = '-DLUA_COMPAT_ALL -DLUA_USE_LINUX'
   local libs = '-lm -ldl -lreadline'
-  
+
   __("gcc -fPIC -O2 -Wall " .. defs .. " -c " .. mlist)
   __("ar rcu liblua52.a " .. olist)
   __("ranlib liblua52.a")
-  
+
   __("gcc -shared -fpic -Wl,-E -o liblua52.so -O2 -Wall " .. defs .. " " .. olist .. "")
   __("rm " .. olist)
 
   __("gcc -O2 -Wall " .. defs .. " -c -o lua.o " .. src_path .. "lua.c");
   __("gcc -o lua lua.o liblua52.so " .. libs);
-  
+
   __("gcc -O2 -Wall " .. defs .. " -c -o luac.o " .. src_path .. "luac.c");
   __("gcc -o luac luac.o liblua52.a " .. libs);
-  
+
   __("rm lua.o luac.o")
-  
+
   __("mv liblua52.so " .. share)
   __("mv liblua52.a " .. lib)
   __("mv lua " .. utils)

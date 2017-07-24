@@ -2,29 +2,17 @@
 
 uname=`uname`
 install_lwdg="tools/install.lua"
-is_standalone_lua=false
-
-for arg; do
-  if [[ $arg == "lua" || $uname == MINGW* ]]; then
-    is_standalone_lua=true
-    break
-  fi
-done
 
 if [[ $uname == Linux* || $uname == Darwin* ]]; then
-  slua="./temp/standalone-lua"
-  if [[ $is_standalone_lua == true ]]; then
-    luai=$slua
-  else
-    luai="lua"
-  fi
+  luai="./temp/standalone-lua"
 else
-  slua="./temp/standalone-lua.exe"
-  luai=$slua
+  luai="./temp/standalone-lua.exe"
 fi
 
-if [[ ! -f "$slua" && ($uname == MINGW* || $is_standalone_lua == true) ]]; then
+if [[ ! -f "$luai" ]]; then
   bash build_lua.sh
+else
+  echo 'WARNING! Standalone lua interpreter won''t be rebuilt since it already exists: ./temp/standalone-lua'
 fi
 
 case $uname in
@@ -40,12 +28,9 @@ case $uname in
     if [ -n "$*" ]; then
       $luai $install_lwdg $*
     else
-      $luai $install_lwdg setenv
+      $luai $install_lwdg 'setenv'
       source ~/.devenv
-      if [[ $is_standalone_lua == true ]]; then
-        $luai $install_lwdg testprg createtree lutils lua extutl localutl
-      fi
-      $luai $install_lwdg testprg createtree lutils extutl localutl
+      $luai $install_lwdg 'testprg' 'createtree' 'lutils' 'lua' 'extutl' 'localutl'
     fi
     ;;
 esac
