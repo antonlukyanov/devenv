@@ -127,7 +127,7 @@ function init_rules( params )
   libs('-llua52')
 
   if os_type == 'linux' then
-    libs('-llua52')
+    libs('-llua52 -ldl')
   end
 
   if params.libs then
