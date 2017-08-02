@@ -682,7 +682,7 @@ local function main( action, lakefilename, parser )
   run_param.is_verb = parser:option('v')
   run_param.is_dry = parser:option('d')
   local do_link = not parser:option('c')
-  local do_strip = not parser:option('s')
+  local do_strip = parser:option('s')
 
   local cwd = lfs.currentdir()
   prot_run(lakefilename, lake_env)
